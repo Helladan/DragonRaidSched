@@ -1,40 +1,40 @@
 package scheduler;
 
-import net.dv8tion.jda.core.entities.TextChannel;
-import populator.MapPresentToMapIdPopulator;
+import bot.domain.Datas;
+
 import static java.lang.String.format;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Map;
 
 public class SaveRunable implements Runnable {
     public final static String PRESENCE_FOLDER = "save/presence/";
     public final static String PRESENCE_FILE = "%s.sav";
     public final static String PLAYER_FILE = "save/player.sav";
+    public final static String DATA_FILE = "save/data.sav";
 
-    Map<TextChannel, List<String>> isPresent;
-    Map<String, String> playerMap;
-    public SaveRunable(Map<TextChannel, List<String>> isPresent, Map<String, String> playerMap) {
-        this.isPresent = isPresent;
-        this.playerMap = playerMap;
+    Datas data;
+
+    public SaveRunable(Datas data) {
+        this.data = data;
     }
 
     @Override
     public void run() {
         try {
-            FileOutputStream fos = null;
-            ObjectOutputStream oos = null;
-            Map<String, List<String>> isPresentId = MapPresentToMapIdPopulator.populate(isPresent);
-            for(String chanelId : isPresentId.keySet()) {
-                fos = new FileOutputStream(PRESENCE_FOLDER + format(PRESENCE_FILE, chanelId));
-                oos = new ObjectOutputStream(fos);
-                oos.writeObject(isPresentId.get(chanelId));
-                oos.close();
+            File file = new File(PRESENCE_FOLDER);
+            if(file.exists()){
+                file.delete();
             }
-            fos = new FileOutputStream(PLAYER_FILE);
-            oos = new ObjectOutputStream(fos);
-            oos.writeObject(playerMap);
+            file = new File(PLAYER_FILE);
+            if(file.exists()){
+                file.delete();
+            }
+            file = new File(DATA_FILE);
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(data);
             oos.close();
         } catch (java.io.IOException e) {
             e.printStackTrace();
