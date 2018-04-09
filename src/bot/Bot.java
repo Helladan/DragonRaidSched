@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Bot {
-    public static final String SAY_PRESENT = "Présent";
     private JDA jda;
     private final static String SAY_TARGET = "Cible";
     private final static String SAY_MODE = "Mode";
-    private final static String SAY_RRESERVE = "Reserve";
+    private final static String SAY_RESERVE = "Reserve";
     Datas data = new Datas();
 
     public Bot(String token) throws LoginException, InterruptedException, ExecutionException, IOException, ClassNotFoundException {
@@ -137,7 +136,7 @@ public class Bot {
             for(String present : infos.getIsPresent().subList(10, infos.getIsPresent().size())){
                 Member member = guild.getMembersByName(present, false).get(0);
                 String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-                annonceBuilder.addField(userName + "[" + SAY_RRESERVE + "]", data.getPlayerMap().get(present), false);
+                annonceBuilder.addField(userName + "[" + SAY_RESERVE + "]", data.getPlayerMap().get(present), false);
             }
         }
         return annonceBuilder.build();
