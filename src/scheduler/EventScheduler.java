@@ -1,6 +1,8 @@
 package scheduler;
 
+import bot.domain.Data;
 import bot.domain.Datas;
+import bot.domain.Info;
 import bot.domain.Infos;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -16,8 +18,8 @@ public class EventScheduler {
     private ScheduledExecutorService executor;
 
 
-    public EventScheduler(TextChannel textChannel, Datas data) {
-        Infos info = data.getInfos().get(textChannel.getId());
+    public EventScheduler(TextChannel textChannel, Data data) {
+        Info info = data.getInfos().get(textChannel.getId());
         executor = Executors.newScheduledThreadPool(3);
         Calendar schedul = getNextSchedul();
 

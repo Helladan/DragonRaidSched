@@ -1,7 +1,7 @@
 package bot;
 
-import bot.domain.Datas;
-import bot.domain.Infos;
+import bot.domain.*;
+import lombok.AllArgsConstructor;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -16,20 +16,18 @@ import static java.lang.String.format;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
 
 public class Bot {
     private JDA jda;
-    private final static String SAY_TARGET = "Cible";
-    private final static String SAY_MODE = "Mode";
+    private final static String SAY_MODE = "Mode : %s";
     private final static String SAY_RESERVE = "Reserve";
-    Datas data = new Datas();
+    private final static String SAY_INSCRIT = "   *%s/10 inscrit";
+    Data data = new Data();
 
     public Bot(String token) throws LoginException, InterruptedException, ExecutionException, IOException, ClassNotFoundException {
         jda = new JDABuilder(AccountType.BOT).setToken(token).setBulkDeleteSplittingEnabled(false).buildBlocking();
@@ -44,13 +42,13 @@ public class Bot {
         for (Guild guild : jda.getGuilds()) {
             for (TextChannel textChannel : guild.getTextChannels()) {
                 if (textChannel.canTalk()) {
-                    Infos infos = data.getInfos().get(textChannel.getId());
-                    if(infos == null){
-                        infos = new Infos();
-                        data.getInfos().put(textChannel.getId(), infos);
+                    Info info = data.getInfos().get(textChannel.getId());
+                    if(info == null){
+                        info = new Info();
+                        data.getInfos().put(textChannel.getId(), info);
                     }
                     new EventScheduler(textChannel, data);
-                        refrechAnnonce(getMessageById(textChannel, infos.getAnnonceId()));
+                        refrechAnnonce(getMessageById(textChannel, info.getAnnonceId()));
                 }
             }
         }
@@ -62,8 +60,8 @@ public class Bot {
             System.out.println("    " + event.getAuthor().getName() + " : " + event.getMessage().getContentDisplay());
             if (!event.getAuthor().equals(jda.getSelfUser())) {
                 if(ProcessMessage.process(event, data)){
-                    Infos infos = data.getInfos().get(textChannel.getId());
-                    refrechAnnonce(getMessageById(textChannel, infos.getAnnonceId()));
+                    Info info = data.getInfos().get(textChannel.getId());
+                    refrechAnnonce(getMessageById(textChannel, info.getAnnonceId()));
                 }
                 textChannel.deleteMessageById(event.getMessageId()).submit();
             }
@@ -76,70 +74,104 @@ public class Bot {
         if(file.exists()) {
             FileInputStream fis = fis = new FileInputStream(file);
             ObjectInputStream ois = ois = new ObjectInputStream(fis);
-            data = ((Datas) ois.readObject());
-            ois.close();
-        }else{
-            File folder = new File(SaveRunable.PRESENCE_FOLDER);
-            TextChannel textChannel = null;
-            Infos infos = new Infos();
-            if (folder.exists()) {
-                infos.setIsPresent(new ArrayList<>());
-                for (File presencesFile : folder.listFiles()) {
-                    FileInputStream fis = fis = new FileInputStream(presencesFile);
-                    ObjectInputStream ois = ois = new ObjectInputStream(fis);
-                    String chanelId = presencesFile.getName().replace(format(SaveRunable.PRESENCE_FILE, ""), "");
-                    textChannel = jda.getTextChannelById(chanelId);
-                    infos.getIsPresent().addAll((List<String>) ois.readObject());
-                    ois.close();
-                    if(textChannel != null) {
-                        data.getInfos().put(textChannel.getId(), infos);
-                    }
+            Object o = ois.readObject();
+            try {
+                data = ((Data) o);
+            }catch (ClassCastException e){
+                Datas datas = ((Datas) o);
+                data.setPlayerMap(datas.getPlayerMap());
+                Map<String, Info> infos = new HashMap<>();
+                for(Map.Entry<String, Infos> oldInfo : datas.getInfos().entrySet()){
+                    Info info = new Info();
+                    info.setAnnonceId(oldInfo.getValue().getAnnonceId());
+                    info.setIsPresent(oldInfo.getValue().getIsPresent());
+                    info.setMode(oldInfo.getValue().getMode());
+                    info.setTarget(oldInfo.getValue().getTarget());
+                    infos.put(oldInfo.getKey(), info);
                 }
+                data.setInfos(infos);
             }
-            file = new File(SaveRunable.PLAYER_FILE);
-            if (file.exists()) {
-                FileInputStream fis = fis = new FileInputStream(file);
-                ObjectInputStream ois = ois = new ObjectInputStream(fis);
-                data.setPlayerMap((Map<String, String>) ois.readObject());
-                ois.close();
-            }
+            ois.close();
         }
     }
 
     private void refrechAnnonce(Message message) {
-        Infos infos = data.getInfos().get(message.getTextChannel().getId());
+        Info info = data.getInfos().get(message.getTextChannel().getId());
         Guild guild = message.getGuild();
         Message newMessage = message;
-        message.editMessage(getAnnonce(infos, guild))
+        message.editMessage(getAnnonce(info, guild))
                 .submit();
     }
 
-    private MessageEmbed getAnnonce(Infos infos, Guild guild){
+    private MessageEmbed getAnnonce(Info info, Guild guild){
         EmbedBuilder annonceBuilder = new EmbedBuilder();
         annonceBuilder.setTitle(EventRunable.getMessage());
         annonceBuilder.setColor(Color.RED);
-        if(infos.getTarget() != null && !"".equals(infos.getTarget())){
-            annonceBuilder.addField(SAY_TARGET, infos.getTarget(), true);
+        String description = "";
+        if(info.getTarget() != null && !"".equals(info.getTarget())){
+            try{
+                Cible cible = Cible.valueOf(info.getTarget().toUpperCase());
+                description = cible.getNom();
+                annonceBuilder.setThumbnail(cible.getUrl());
+            }catch (IllegalArgumentException e){
+                description =info.getTarget();
+            }
+            description = "**" + description + "**\n";
         }
-        if(infos.getMode()!= null && !"".equals(infos.getMode())){
-            annonceBuilder.addField(SAY_MODE, infos.getMode(), true);
+        int size = info.getIsPresent().size();
+        description += String.format(SAY_INSCRIT, size) + (size>1?"s*":"*");
+        annonceBuilder.setDescription(description);
+        if(info.getMode()!= null && !"".equals(info.getMode())){
+            try{
+                Mode mode = Mode.valueOf(info.getMode().toUpperCase());
+                annonceBuilder.setFooter(format(SAY_MODE, mode.getNom()), mode.getUrl());
+            }catch (IllegalArgumentException e){
+                annonceBuilder.setFooter(format(SAY_MODE, info.getMode()), null);
+            }
         }
-        annonceBuilder.addBlankField(false);
-        List<String> presents = infos.getIsPresent().subList(0, infos.getIsPresent().size() <= 10 ? infos.getIsPresent().size() : 10);
+        Collections.sort(info.getIsPresent(), new RaidLeadFirst(info.getRaidLead()));
+        List<String> presents = info.getIsPresent().subList(0, size <= 10 ? size : 10);
         for(String present : presents){
             Member member = guild.getMembersByName(present, false).get(0);
             String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-            annonceBuilder.addField(userName, data.getPlayerMap().get(present), false);
+            String name = "";
+            for(int i = 0; i < userName.length(); i++){
+                char c = userName.charAt(i);
+                if(c<=255){
+                    name += c;
+                }
+            }
+            if(present.equals(info.getRaidLead())){
+                name = info.getRaidEmote() + " " + name;
+            }
+            annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
         }
-        if(infos.getIsPresent().size()> 10){
+        if(size > 10){
             annonceBuilder.addBlankField(false);
-            for(String present : infos.getIsPresent().subList(10, infos.getIsPresent().size())){
+            for(String present : info.getIsPresent().subList(10, size)){
                 Member member = guild.getMembersByName(present, false).get(0);
                 String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-                annonceBuilder.addField(userName + "[" + SAY_RESERVE + "]", data.getPlayerMap().get(present), false);
+                annonceBuilder.addField(userName + "[" + SAY_RESERVE + "]", " ⇨ " + data.getPlayerMap().get(present), false);
             }
         }
         return annonceBuilder.build();
+    }
+
+    @AllArgsConstructor
+    private class RaidLeadFirst implements Comparator<String> {
+
+        String readLead;
+
+        @Override
+        public int compare(String o1, String o2) {
+            if(o1.equals(readLead)){
+                return -1;
+            }
+            if (o2.equals(readLead)){
+                return 1;
+            }
+            return 0;
+        }
     }
 
     private Message getMessageById(TextChannel textChannel, String id){

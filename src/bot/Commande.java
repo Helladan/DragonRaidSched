@@ -22,5 +22,5 @@ import java.util.concurrent.ExecutionException;
 import static java.lang.String.format;
 
 public enum Commande {
-    PRESENT, NON_PRESENT, MODE, TARGET
+    PRESENT, NON_PRESENT, MODE, TARGET, RAID_LEAD
 }

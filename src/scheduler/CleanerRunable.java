@@ -1,14 +1,15 @@
 package scheduler;
 
+import bot.domain.Info;
 import bot.domain.Infos;
 
 import java.util.ArrayList;
 
 public class CleanerRunable implements Runnable {
 
-    private Infos info;
+    private Info info;
 
-    public CleanerRunable(Infos info) {
+    public CleanerRunable(Info info) {
         this.info = info;
     }
 

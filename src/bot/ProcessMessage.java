@@ -1,6 +1,8 @@
 package bot;
 
+import bot.domain.Data;
 import bot.domain.Datas;
+import bot.domain.Info;
 import bot.domain.Infos;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
@@ -19,22 +21,23 @@ public class ProcessMessage {
     private final static List<String> NON_PRESENT = new ArrayList<String>(Arrays.asList(new String[]{"np", "non-present", "non-présent"}));
     private final static String MODE = "/m";
     private final static String TARGET = "/t";
+    private final static String RAID_LEAD = "/rl";
 
 
-    public static boolean process(MessageReceivedEvent event, Datas data) {
+    public static boolean process(MessageReceivedEvent event, Data data) {
         RestAction<PrivateChannel> privateChannel = event.getAuthor().openPrivateChannel();
         boolean needRefrech = false;
-        Infos infos = data.getInfos().get(event.getTextChannel().getId());
-        if(infos == null){
-            data.getInfos().put(event.getTextChannel().getId(), new Infos());
+        Info info = data.getInfos().get(event.getTextChannel().getId());
+        if(info == null){
+            data.getInfos().put(event.getTextChannel().getId(), new Info());
         }
-        if (infos.getAnnonceId() != null) {
+        if (info.getAnnonceId() != null) {
             Message message = event.getMessage();
             String pseudo = event.getAuthor().getName();
-            if(infos.getIsPresent() == null){
-                infos.setIsPresent(new ArrayList<>());
+            if(info.getIsPresent() == null){
+                info.setIsPresent(new ArrayList<>());
             }
-            List<String> presents = infos.getIsPresent();
+            List<String> presents = info.getIsPresent();
             String contentDisplay = message.getContentDisplay();
             if(isCommande(contentDisplay.toLowerCase())){
                 Commande commande = getCommande(contentDisplay.toLowerCase());
@@ -57,7 +60,8 @@ public class ProcessMessage {
                         break;
                     case MODE:
                     case TARGET:
-                        needRefrech = applyCommande(event, privateChannel, infos, commande);
+                    case RAID_LEAD:
+                        needRefrech = applyCommande(event, privateChannel, info, commande);
                         break;
                 }
             }else if (isInscription(contentDisplay.toLowerCase())){
@@ -96,6 +100,9 @@ public class ProcessMessage {
         if (message.startsWith(TARGET)){
             return Commande.TARGET;
         }
+        if (message.startsWith(RAID_LEAD)){
+            return Commande.RAID_LEAD;
+        }
         return null;
     }
 
@@ -113,19 +120,29 @@ public class ProcessMessage {
     }
 
     private static String getParams(String message){
-        return (message.length()>2?message.substring(message.split(" ")[0].length() + 1):null);
+        return (message.split(" ").length > 1?message.substring(message.split(" ")[0].length() + 1):null);
     }
 
-    private static boolean applyCommande(MessageReceivedEvent event, RestAction<PrivateChannel> privateChannel, Infos infos, Commande commande){
+    private static boolean applyCommande(MessageReceivedEvent event, RestAction<PrivateChannel> privateChannel, Info info, Commande commande){
 
         if(hasPermition(event)){
             String message = event.getMessage().getContentDisplay();
-            switch (commande){
+            String params = getParams(message);
+            switch (commande) {
                 case TARGET:
-                    infos.setTarget(getParams(message));
+                    info.setTarget(params);
                     break;
                 case MODE:
-                    infos.setMode(getParams(message));
+                    info.setMode(params);
+                    break;
+                case RAID_LEAD:
+                    if (params != null && !"".equals(params)) {
+                        info.setRaidEmote(event.getMessage().getEmotes().get(0).getAsMention());
+                        info.setRaidLead(event.getAuthor().getName());
+                    } else{
+                        info.setRaidEmote(null);
+                        info.setRaidLead(null);
+                    }
                     break;
             }
             return true;

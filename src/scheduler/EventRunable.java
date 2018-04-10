@@ -1,6 +1,6 @@
 package scheduler;
 
-import bot.domain.Infos;
+import bot.domain.Info;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
@@ -21,11 +21,11 @@ public class EventRunable implements Runnable{
     private final static String SAY = "Raid du %s à %s";
 
     private TextChannel textChannel;
-    private Infos infos;
+    private Info info;
 
-    public EventRunable(TextChannel textChannel, Infos infos) {
+    public EventRunable(TextChannel textChannel, Info info) {
         this.textChannel = textChannel;
-        this.infos = infos;
+        this.info = info;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class EventRunable implements Runnable{
             do {
                 Thread.sleep(1000);
             } while (!request.isDone());
-            infos.setAnnonceId(request.get().getId());
+            info.setAnnonceId(request.get().getId());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace(System.err);
         }

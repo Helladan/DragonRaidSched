@@ -1,5 +1,6 @@
 package scheduler;
 
+import bot.domain.Data;
 import bot.domain.Datas;
 
 import static java.lang.String.format;
@@ -14,9 +15,9 @@ public class SaveRunable implements Runnable {
     public final static String PLAYER_FILE = "save/player.sav";
     public final static String DATA_FILE = "save/data.sav";
 
-    Datas data;
+    Data data;
 
-    public SaveRunable(Datas data) {
+    public SaveRunable(Data data) {
         this.data = data;
     }
 
