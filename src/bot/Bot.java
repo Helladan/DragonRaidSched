@@ -105,19 +105,20 @@ public class Bot {
 
     private MessageEmbed getAnnonce(Info info, Guild guild){
         EmbedBuilder annonceBuilder = new EmbedBuilder();
-        annonceBuilder.setTitle(EventRunable.getMessage());
         annonceBuilder.setColor(Color.BLUE);
         String description = "";
+        Cible cible = null;
         if(info.getTarget() != null && !"".equals(info.getTarget())){
             try{
-                Cible cible = Cible.valueOf(info.getTarget().toUpperCase());
+                cible = Cible.valueOf(info.getTarget().toUpperCase());
                 description = cible.getNom();
-                annonceBuilder.setThumbnail(cible.getUrl());
+                annonceBuilder.setThumbnail(cible.getImageUrl());
             }catch (IllegalArgumentException e){
                 description =info.getTarget();
             }
             description = "**" + description + "**\n";
         }
+        annonceBuilder.setTitle(EventRunable.getMessage(), cible!=null?cible.getTutoUrl():null);
         int size = info.getIsPresent().size();
         description += String.format(SAY_INSCRIT, size) + (size>1?"s*":"*");
         annonceBuilder.setDescription(description);
