@@ -18,6 +18,8 @@ public enum Cible {
     SAMAROG("Samarog", "https://wiki.guildwars2.com/images/f/f0/Mini_Samarog.png"),
     DEIMOS("Deimos", "https://wiki.guildwars2.com/images/e/e0/Mini_Ragged_White_Mantle_Figurehead.png"),
     HORREUR("Horreur sans âme", "https://wiki.guildwars2.com/images/d/d4/Mini_Desmina.png"),
+    GRENTH("Statues of Grenth", "https://wiki.guildwars2.com/images/3/37/Mini_Broken_King.png"),
+    DHUUM("Dhuum", "https://wiki.guildwars2.com/images/e/e4/Mini_Dhuum.png"),
     VG("Vale Guardian", "https://wiki-fr.guildwars2.com/images/0/0f/Mini-Gardien_de_la_Vall%C3%A9e.png");
 
     private String nom;
