@@ -106,7 +106,7 @@ public class Bot {
     private MessageEmbed getAnnonce(Info info, Guild guild){
         EmbedBuilder annonceBuilder = new EmbedBuilder();
         annonceBuilder.setTitle(EventRunable.getMessage());
-        annonceBuilder.setColor(Color.RED);
+        annonceBuilder.setColor(Color.BLUE);
         String description = "";
         if(info.getTarget() != null && !"".equals(info.getTarget())){
             try{
