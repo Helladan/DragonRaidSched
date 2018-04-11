@@ -22,7 +22,7 @@ public enum Cible {
             "http://www.lebusmagique.fr/pages/expeditions/raids/forteresse-des-fideles/assaut-sur-la-forteresse.html"),
     TITAN("Titan du fort", "https://wiki.guildwars2.com/images/e/ea/Mini_Keep_Construct.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/forteresse-des-fideles/le-titan-du-fort.html"),
-    CHATEAU("Le Château corrompu", "http://www.lebusmagique.fr/medias/images/labyrinthe-64px.png",
+    CHATEAU("Le Château corrompu", "https://cdn.discordapp.com/attachments/363023600376348684/433233933799391242/Sans_titre.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/forteresse-des-fideles/le-chateau-corrompu.html"),
     XERA("Xera", "https://wiki.guildwars2.com/images/4/4b/Mini_Xera.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/forteresse-des-fideles/xera.html"),
@@ -34,7 +34,7 @@ public enum Cible {
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/samarog.html"),
     DEIMOS("Deimos", "https://wiki.guildwars2.com/images/e/e0/Mini_Ragged_White_Mantle_Figurehead.png", null),
     HORREUR("Horreur sans âme", "https://wiki.guildwars2.com/images/d/d4/Mini_Desmina.png", null),
-    GRENTH("Statues of Grenth", "https://wiki.guildwars2.com/images/3/37/Mini_Broken_King.png", null),
+    GRENTH("Statues de Grenth", "https://wiki.guildwars2.com/images/3/37/Mini_Broken_King.png", null),
     DHUUM("Dhuum", "https://wiki.guildwars2.com/images/e/e4/Mini_Dhuum.png", null);
 
     private String nom;

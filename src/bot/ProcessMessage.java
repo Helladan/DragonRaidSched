@@ -1,15 +1,11 @@
 package bot;
 
 import bot.domain.Data;
-import bot.domain.Datas;
 import bot.domain.Info;
-import bot.domain.Infos;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
 
@@ -18,6 +14,7 @@ import java.util.regex.Pattern;
 
 public class ProcessMessage {
     private final static List<String> PRESENT = new ArrayList<String>(Arrays.asList(new String[]{"p", "present", "présent"}));
+    private final static List<String> RESERVE = new ArrayList<String>(Arrays.asList(new String[]{"r", "reserve", "réserve"}));
     private final static List<String> NON_PRESENT = new ArrayList<String>(Arrays.asList(new String[]{"np", "non-present", "non-présent"}));
     private final static String MODE = "/m";
     private final static String TARGET = "/t";
@@ -37,22 +34,29 @@ public class ProcessMessage {
             if(info.getIsPresent() == null){
                 info.setIsPresent(new ArrayList<>());
             }
-            List<String> presents = info.getIsPresent();
             String contentDisplay = message.getContentDisplay();
             if(isCommande(contentDisplay.toLowerCase())){
                 Commande commande = getCommande(contentDisplay.toLowerCase());
                 switch (commande){
                     case PRESENT:
                         if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
-                            addPlayer(pseudo, presents, privateChannel);
+                            addPlayer(pseudo, info, privateChannel);
+                            needRefrech = true;
+                        } else {
+                            privateChannel.complete().sendMessage("T'es qui ?!").submit();
+                        }
+                        break;
+                    case RESERVE:
+                        if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
+                            addReserve(pseudo, info);
                             needRefrech = true;
                         } else {
                             privateChannel.complete().sendMessage("T'es qui ?!").submit();
                         }
                         break;
                     case NON_PRESENT:
-                        if(presents.contains(pseudo)){
-                            presents.remove(pseudo);
+                        if(info.getIsPresent().contains(pseudo) || info.getReserve().contains(pseudo)){
+                            removePlayer(pseudo, info);
                             needRefrech = true;
                         }else{
                             privateChannel.complete().sendMessage("Tu été pas compté de toutes maniére").submit();
@@ -71,7 +75,7 @@ public class ProcessMessage {
                     classes += emote.getAsMention();
                 }
                 data.getPlayerMap().put(pseudo, classes);
-                addPlayer(pseudo, presents, privateChannel);
+                addPlayer(pseudo, info, privateChannel);
                 needRefrech = true;
             }else{
                 privateChannel.complete().sendMessage("Arrete de raconter de la merde !").submit();
@@ -88,31 +92,52 @@ public class ProcessMessage {
     }
 
     private static Commande getCommande(String message){
+        message = message.split(" ")[0];
         if(PRESENT.contains(message)){
             return Commande.PRESENT;
         }
         if(NON_PRESENT.contains(message)){
             return Commande.NON_PRESENT;
         }
-        if (message.startsWith(MODE)){
+        if(RESERVE.contains(message)){
+            return Commande.RESERVE;
+        }
+        if (message.equals(MODE)){
             return Commande.MODE;
         }
-        if (message.startsWith(TARGET)){
+        if (message.equals(TARGET)){
             return Commande.TARGET;
         }
-        if (message.startsWith(RAID_LEAD)){
+        if (message.equals(RAID_LEAD)){
             return Commande.RAID_LEAD;
         }
         return null;
     }
 
-    private static void addPlayer(String pseudo, List<String> presents, RestAction<PrivateChannel> privateChannel) {
-        if(!presents.contains(pseudo)) {
-            presents.add(pseudo);
-            if(presents.size() > 10){
+    private static void addPlayer(String pseudo, Info info, RestAction<PrivateChannel> privateChannel) {
+        List<String> isPresent = info.getIsPresent();
+        List<String> reserve = info.getReserve();
+        if(!isPresent.contains(pseudo)) {
+            isPresent.add(pseudo);
+            reserve.remove(pseudo);
+            if(isPresent.size() > 10){
                 privateChannel.complete().sendMessage("10 personnes sont déjà inscrites, tu seras sur le banc de touche").submit();
             }
         }
+    }
+    private static void addReserve(String pseudo, Info info) {
+        List<String> isPresent = info.getIsPresent();
+        List<String> reserve = info.getReserve();
+        if(!reserve.contains(pseudo)){
+            isPresent.remove(pseudo);
+            reserve.add(pseudo);
+        }
+    }
+    private static void removePlayer(String pseudo, Info info) {
+        List<String> isPresent = info.getIsPresent();
+        List<String> reserve = info.getReserve();
+        isPresent.remove(pseudo);
+        reserve.remove(pseudo);
     }
 
     private static boolean isCommande(String message){

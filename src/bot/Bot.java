@@ -25,7 +25,8 @@ import java.util.regex.Matcher;
 public class Bot {
     private JDA jda;
     private final static String SAY_MODE = "Mode : %s";
-    private final static String SAY_RESERVE = "Reserve";
+    private final static String SAY_RESERVE = "⟾ __**Reserve**__ ⟽";
+    private final static String SAY_COMBATTANT= "⟾ __**Combattant**__ ⟽";
     private final static String SAY_INSCRIT = "   *%s/10 inscrit";
     Data data = new Data();
 
@@ -46,6 +47,9 @@ public class Bot {
                     if(info == null){
                         info = new Info();
                         data.getInfos().put(textChannel.getId(), info);
+                    }
+                    if(info.getReserve() == null){
+                        info.setReserve(new ArrayList<>());
                     }
                     new EventScheduler(textChannel, data);
                         refrechAnnonce(getMessageById(textChannel, info.getAnnonceId()));
@@ -74,23 +78,7 @@ public class Bot {
         if(file.exists()) {
             FileInputStream fis = fis = new FileInputStream(file);
             ObjectInputStream ois = ois = new ObjectInputStream(fis);
-            Object o = ois.readObject();
-            try {
-                data = ((Data) o);
-            }catch (ClassCastException e){
-                Datas datas = ((Datas) o);
-                data.setPlayerMap(datas.getPlayerMap());
-                Map<String, Info> infos = new HashMap<>();
-                for(Map.Entry<String, Infos> oldInfo : datas.getInfos().entrySet()){
-                    Info info = new Info();
-                    info.setAnnonceId(oldInfo.getValue().getAnnonceId());
-                    info.setIsPresent(oldInfo.getValue().getIsPresent());
-                    info.setMode(oldInfo.getValue().getMode());
-                    info.setTarget(oldInfo.getValue().getTarget());
-                    infos.put(oldInfo.getKey(), info);
-                }
-                data.setInfos(infos);
-            }
+            data = ((Data) ois.readObject());
             ois.close();
         }
     }
@@ -120,7 +108,7 @@ public class Bot {
         }
         annonceBuilder.setTitle(EventRunable.getMessage(), cible!=null?cible.getTutoUrl():null);
         int size = info.getIsPresent().size();
-        description += String.format(SAY_INSCRIT, size) + (size>1?"s*":"*");
+        description += String.format(SAY_INSCRIT, size + info.getReserve().size()) + (size + info.getReserve().size()>1?"s*":"*");
         annonceBuilder.setDescription(description);
         if(info.getMode()!= null && !"".equals(info.getMode())){
             try{
@@ -132,30 +120,45 @@ public class Bot {
         }
         Collections.sort(info.getIsPresent(), new RaidLeadFirst(info.getRaidLead()));
         List<String> presents = info.getIsPresent().subList(0, size <= 10 ? size : 10);
+        if(size>0) {
+            annonceBuilder.addField("", SAY_COMBATTANT, false);
+        }
         for(String present : presents){
             Member member = guild.getMembersByName(present, false).get(0);
             String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-            String name = "";
-            for(int i = 0; i < userName.length(); i++){
-                char c = userName.charAt(i);
-                if(c<=255){
-                    name += c;
-                }
-            }
+            String name = getName(userName);
             if(present.equals(info.getRaidLead())){
                 name = info.getRaidEmote() + " " + name;
             }
             annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
         }
+        if(size > 10 ||info.getReserve().size()>0){
+            annonceBuilder.addField("", SAY_RESERVE, false);
+        }
         if(size > 10){
-            annonceBuilder.addBlankField(false);
             for(String present : info.getIsPresent().subList(10, size)){
                 Member member = guild.getMembersByName(present, false).get(0);
                 String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-                annonceBuilder.addField(userName + "[" + SAY_RESERVE + "]", " ⇨ " + data.getPlayerMap().get(present), false);
+                annonceBuilder.addField(getName(userName), " ⇨ " + data.getPlayerMap().get(present), false);
             }
         }
+        for(String present : info.getReserve()){
+            Member member = guild.getMembersByName(present, false).get(0);
+            String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
+            annonceBuilder.addField(getName(userName), " ⇨ " + data.getPlayerMap().get(present), false);
+        }
         return annonceBuilder.build();
+    }
+
+    private String getName(String userName) {
+        String name = "";
+        for(int i = 0; i < userName.length(); i++){
+            char c = userName.charAt(i);
+            if(c<=255){
+                name += c;
+            }
+        }
+        return name;
     }
 
     @AllArgsConstructor
