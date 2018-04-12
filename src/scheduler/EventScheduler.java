@@ -18,7 +18,7 @@ public class EventScheduler {
 
     public EventScheduler(TextChannel textChannel, Data data) {
         Info info = data.getInfos().get(textChannel.getId());
-        executor = Executors.newScheduledThreadPool(3);
+        executor = Executors.newScheduledThreadPool(2);
         Calendar schedul = getNextSchedul();
 
 
@@ -29,7 +29,7 @@ public class EventScheduler {
         long initialDelay = schedul.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + endEvent;
 
         executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
-        executor.scheduleAtFixedRate(new EventRunable(textChannel, info),
+        executor.scheduleAtFixedRate(new EventRunable(data, textChannel),
                 initialDelay,
                 period,
                 TimeUnit.MILLISECONDS);

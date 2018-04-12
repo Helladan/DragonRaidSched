@@ -2,6 +2,7 @@ package bot;
 
 import bot.domain.Data;
 import bot.domain.Info;
+import lombok.AllArgsConstructor;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Message;
@@ -23,7 +24,6 @@ public class ProcessMessage {
 
     public static boolean process(MessageReceivedEvent event, Data data) {
         RestAction<PrivateChannel> privateChannel = event.getAuthor().openPrivateChannel();
-        boolean needRefrech = false;
         Info info = data.getInfos().get(event.getTextChannel().getId());
         if(info == null){
             data.getInfos().put(event.getTextChannel().getId(), new Info());
@@ -41,7 +41,7 @@ public class ProcessMessage {
                     case PRESENT:
                         if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
                             addPlayer(pseudo, info, privateChannel);
-                            needRefrech = true;
+                            return sortAndRefrech(info);
                         } else {
                             privateChannel.complete().sendMessage("T'es qui ?!").submit();
                         }
@@ -49,7 +49,7 @@ public class ProcessMessage {
                     case RESERVE:
                         if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
                             addReserve(pseudo, info);
-                            needRefrech = true;
+                            return sortAndRefrech(info);
                         } else {
                             privateChannel.complete().sendMessage("T'es qui ?!").submit();
                         }
@@ -57,7 +57,7 @@ public class ProcessMessage {
                     case NON_PRESENT:
                         if(info.getIsPresent().contains(pseudo) || info.getReserve().contains(pseudo)){
                             removePlayer(pseudo, info);
-                            needRefrech = true;
+                            return sortAndRefrech(info);
                         }else{
                             privateChannel.complete().sendMessage("Tu été pas compté de toutes maniére").submit();
                         }
@@ -65,8 +65,7 @@ public class ProcessMessage {
                     case MODE:
                     case TARGET:
                     case RAID_LEAD:
-                        needRefrech = applyCommande(event, privateChannel, info, commande);
-                        break;
+                        return applyCommande(event, privateChannel, info, commande);
                 }
             }else if (isInscription(contentDisplay.toLowerCase())){
                 List<Emote> emotes = message.getEmotes();
@@ -76,13 +75,20 @@ public class ProcessMessage {
                 }
                 data.getPlayerMap().put(pseudo, classes);
                 addPlayer(pseudo, info, privateChannel);
-                needRefrech = true;
+                return true;
             }else{
                 privateChannel.complete().sendMessage("Arrete de raconter de la merde !").submit();
             }
         } else {
             privateChannel.complete().sendMessage("Aucune annonce n'a été faites ici connard !").submit();
         }
+        return false;
+    }
+
+    private static boolean sortAndRefrech(Info info) {
+        boolean needRefrech;
+        Collections.sort(info.getIsPresent(), new RaidLeadFirst(info.getRaidLead()));
+        needRefrech = true;
         return needRefrech;
     }
 
@@ -178,5 +184,22 @@ public class ProcessMessage {
     }
     private static boolean hasPermition(MessageReceivedEvent event){
         return event.getMember().getPermissions(event.getTextChannel()).contains(Permission.MESSAGE_MANAGE);
+    }
+
+    @AllArgsConstructor
+    private static class RaidLeadFirst implements Comparator<String> {
+
+        String readLead;
+
+        @Override
+        public int compare(String o1, String o2) {
+            if(o1.equals(readLead)){
+                return -1;
+            }
+            if (o2.equals(readLead)){
+                return 1;
+            }
+            return 0;
+        }
     }
 }
