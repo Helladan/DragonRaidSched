@@ -1,9 +1,7 @@
 package scheduler;
 
 import bot.domain.Data;
-import bot.domain.Datas;
 import bot.domain.Info;
-import bot.domain.Infos;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.text.DateFormat;
@@ -30,13 +28,7 @@ public class EventScheduler {
         int endEvent = 2 * 60 * 60 * 1000;
         long initialDelay = schedul.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + endEvent;
 
-        new EventRunable(textChannel, info).run();
-
         executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
-        executor.scheduleAtFixedRate(new CleanerRunable(info),
-                initialDelay - 10000,
-                period - 10000,
-                TimeUnit.MILLISECONDS);
         executor.scheduleAtFixedRate(new EventRunable(textChannel, info),
                 initialDelay,
                 period,

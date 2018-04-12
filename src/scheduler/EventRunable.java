@@ -1,5 +1,6 @@
 package scheduler;
 
+import bot.Bot;
 import bot.domain.Info;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.core.requests.RequestFuture;
 
 import java.awt.*;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -41,10 +43,10 @@ public class EventRunable implements Runnable{
                     textChannel.deleteMessageById(message.getId()).submit();
                 }
             }
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.setColor(Color.RED);
-            builder.setTitle(getMessage());
-            RequestFuture<Message> request = textChannel.sendMessage(builder.build()).submit();
+            info.setTarget(null);
+            info.setMode(null);
+            info.setIsPresent(new ArrayList<>());
+            RequestFuture<Message> request = textChannel.sendMessage(Bot.getAnnonce(info, textChannel.getGuild())).submit();
             do {
                 Thread.sleep(1000);
             } while (!request.isDone());

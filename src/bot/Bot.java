@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.ErrorResponseException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import scheduler.EventRunable;
 import scheduler.EventScheduler;
@@ -29,7 +30,7 @@ public class Bot {
     private final static String SAY_COMBATTANT= "⟾ __**Combattant**__ ⟽";
     private final static String SAY_NB_INSCRIT = "   *%s inscrit%s*\n";
     private final static String SAY_NB_RESERVE = "   *%s en reserve*";
-    Data data = new Data();
+    private static Data data = new Data();
 
     public Bot(String token) throws LoginException, InterruptedException, ExecutionException, IOException, ClassNotFoundException {
         jda = new JDABuilder(AccountType.BOT).setToken(token).setBulkDeleteSplittingEnabled(false).buildBlocking();
@@ -50,7 +51,11 @@ public class Bot {
                         data.getInfos().put(textChannel.getId(), info);
                     }
                     new EventScheduler(textChannel, data);
-                        refrechAnnonce(getMessageById(textChannel, info.getAnnonceId()));
+
+                    Message message = getMessageById(textChannel, info.getAnnonceId());
+                    if(message == null) {
+                        info.setAnnonceId(textChannel.sendMessage(getAnnonce(data.getInfos().get(textChannel.getId()), textChannel.getGuild())).submit().get().getId());
+                    }
                 }
             }
         }
@@ -89,7 +94,7 @@ public class Bot {
                 .submit();
     }
 
-    private MessageEmbed getAnnonce(Info info, Guild guild){
+    public static MessageEmbed getAnnonce(Info info, Guild guild){
         EmbedBuilder annonceBuilder = new EmbedBuilder();
         annonceBuilder.setColor(Color.BLUE);
         String description = "";
@@ -152,7 +157,7 @@ public class Bot {
         return annonceBuilder.build();
     }
 
-    private String getName(String userName) {
+    private static String getName(String userName) {
         String name = "";
         for(int i = 0; i < userName.length(); i++){
             char c = userName.charAt(i);
@@ -163,8 +168,21 @@ public class Bot {
         return name;
     }
 
+    private Message getMessageById(TextChannel textChannel, String id){
+        if(id != null){
+            try {
+                return textChannel.getMessageById(id).complete();
+            }catch (ErrorResponseException e){
+                System.err.println("Annonce non trouvée");
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
+
     @AllArgsConstructor
-    private class RaidLeadFirst implements Comparator<String> {
+    private static class RaidLeadFirst implements Comparator<String> {
 
         String readLead;
 
@@ -178,9 +196,5 @@ public class Bot {
             }
             return 0;
         }
-    }
-
-    private Message getMessageById(TextChannel textChannel, String id){
-        return textChannel.getMessageById(id).complete();
     }
 }
