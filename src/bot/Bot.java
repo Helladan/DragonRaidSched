@@ -20,14 +20,15 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
 
 public class Bot {
     private JDA jda;
     private final static String SAY_MODE = "Mode : %s";
+    private final static String SAY_TARGET = "**%s**\n";
     private final static String SAY_RESERVE = "⟾ __**Reserve**__ ⟽";
     private final static String SAY_COMBATTANT= "⟾ __**Combattant**__ ⟽";
-    private final static String SAY_INSCRIT = "   *%s/10 inscrit";
+    private final static String SAY_NB_INSCRIT = "   *%s inscrit%s*\n";
+    private final static String SAY_NB_RESERVE = "   *%s en reserve*";
     Data data = new Data();
 
     public Bot(String token) throws LoginException, InterruptedException, ExecutionException, IOException, ClassNotFoundException {
@@ -47,9 +48,6 @@ public class Bot {
                     if(info == null){
                         info = new Info();
                         data.getInfos().put(textChannel.getId(), info);
-                    }
-                    if(info.getReserve() == null){
-                        info.setReserve(new ArrayList<>());
                     }
                     new EventScheduler(textChannel, data);
                         refrechAnnonce(getMessageById(textChannel, info.getAnnonceId()));
@@ -104,11 +102,15 @@ public class Bot {
             }catch (IllegalArgumentException e){
                 description =info.getTarget();
             }
-            description = "**" + description + "**\n";
+            description = format(SAY_TARGET, description);
         }
         annonceBuilder.setTitle(EventRunable.getMessage(), cible!=null?cible.getTutoUrl():null);
-        int size = info.getIsPresent().size();
-        description += String.format(SAY_INSCRIT, size + info.getReserve().size()) + (size + info.getReserve().size()>1?"s*":"*");
+        int presentSize = info.getIsPresent().size();
+        int reserveSize = info.getReserve().size();
+        description += format(SAY_NB_INSCRIT, presentSize + "/10", presentSize >1?"s":"");
+        if(reserveSize > 0){
+            description += format(SAY_NB_RESERVE, reserveSize);
+        }
         annonceBuilder.setDescription(description);
         if(info.getMode()!= null && !"".equals(info.getMode())){
             try{
@@ -119,8 +121,8 @@ public class Bot {
             }
         }
         Collections.sort(info.getIsPresent(), new RaidLeadFirst(info.getRaidLead()));
-        List<String> presents = info.getIsPresent().subList(0, size <= 10 ? size : 10);
-        if(size>0) {
+        List<String> presents = info.getIsPresent().subList(0, presentSize <= 10 ? presentSize : 10);
+        if(presentSize>0) {
             annonceBuilder.addField("", SAY_COMBATTANT, false);
         }
         for(String present : presents){
@@ -132,11 +134,11 @@ public class Bot {
             }
             annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
         }
-        if(size > 10 ||info.getReserve().size()>0){
+        if(presentSize > 10 || reserveSize >0){
             annonceBuilder.addField("", SAY_RESERVE, false);
         }
-        if(size > 10){
-            for(String present : info.getIsPresent().subList(10, size)){
+        if(presentSize > 10){
+            for(String present : info.getIsPresent().subList(10, presentSize)){
                 Member member = guild.getMembersByName(present, false).get(0);
                 String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
                 annonceBuilder.addField(getName(userName), " ⇨ " + data.getPlayerMap().get(present), false);
