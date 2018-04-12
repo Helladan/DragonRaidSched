@@ -1,4 +1,4 @@
-package bot;
+package bot.domain;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;

@@ -1,4 +1,4 @@
-package bot;
+package bot.service;
 
 import bot.domain.Cible;
 import bot.domain.Data;

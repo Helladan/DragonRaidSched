@@ -1,5 +1,6 @@
-package bot;
+package bot.service;
 
+import bot.domain.Commande;
 import bot.domain.Data;
 import bot.domain.Info;
 import lombok.AllArgsConstructor;
