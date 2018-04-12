@@ -11,7 +11,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class EventScheduler {
-    private final static DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.FULL, Locale.FRANCE);
+    // 2 Heures
+    private static final Integer END_EVENT = 2 * 60 * 60 * 1000;
 
     private ScheduledExecutorService executor;
 
@@ -24,9 +25,7 @@ public class EventScheduler {
 
         // 7 Jours
         int period = 7 * 24 * 60 * 60 * 1000;
-        // 2 Heures
-        int endEvent = 2 * 60 * 60 * 1000;
-        long initialDelay = schedul.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + endEvent;
+        long initialDelay = schedul.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + END_EVENT;
 
         executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
         executor.scheduleAtFixedRate(new EventRunable(data, textChannel),
@@ -42,7 +41,7 @@ public class EventScheduler {
         schedul.clear(Calendar.MINUTE);
         schedul.clear(Calendar.SECOND);
         schedul.clear(Calendar.MILLISECOND);
-        if(schedul.before(Calendar.getInstance())){
+        if(Calendar.getInstance().getTimeInMillis() > (schedul.getTimeInMillis() + END_EVENT - 10000)){
             schedul.add(Calendar.DAY_OF_WEEK, 7);
         }
         return schedul;

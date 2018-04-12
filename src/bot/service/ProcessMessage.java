@@ -15,9 +15,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class ProcessMessage {
-    private final static List<String> PRESENT = new ArrayList<String>(Arrays.asList(new String[]{"p", "present", "présent"}));
-    private final static List<String> RESERVE = new ArrayList<String>(Arrays.asList(new String[]{"r", "reserve", "réserve"}));
-    private final static List<String> NON_PRESENT = new ArrayList<String>(Arrays.asList(new String[]{"np", "non-present", "non-présent"}));
+    private final static List<String> PRESENT = new ArrayList<>(Arrays.asList("p", "present", "présent"));
+    private final static List<String> RESERVE = new ArrayList<>(Arrays.asList("r", "reserve", "réserve"));
+    private final static List<String> NON_PRESENT = new ArrayList<>(Arrays.asList("np", "non-present", "non-présent"));
     private final static String MODE = "/m";
     private final static String TARGET = "/t";
     private final static String RAID_LEAD = "/rl";
@@ -27,7 +27,8 @@ public class ProcessMessage {
         RestAction<PrivateChannel> privateChannel = event.getAuthor().openPrivateChannel();
         Info info = data.getInfos().get(event.getTextChannel().getId());
         if(info == null){
-            data.getInfos().put(event.getTextChannel().getId(), new Info());
+            info = new Info();
+            data.getInfos().put(event.getTextChannel().getId(), info);
         }
         if (info.getAnnonceId() != null) {
             Message message = event.getMessage();
@@ -87,10 +88,8 @@ public class ProcessMessage {
     }
 
     private static boolean sortAndRefrech(Info info) {
-        boolean needRefrech;
-        Collections.sort(info.getIsPresent(), new RaidLeadFirst(info.getRaidLead()));
-        needRefrech = true;
-        return needRefrech;
+        info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
+        return true;
     }
 
     private static boolean isInscription(String message) {
