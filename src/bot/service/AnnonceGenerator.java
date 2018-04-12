@@ -5,10 +5,7 @@ import bot.domain.Data;
 import bot.domain.Info;
 import bot.domain.Mode;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 import scheduler.EventRunable;
 import scheduler.EventScheduler;
 
@@ -37,6 +34,14 @@ public class AnnonceGenerator {
         return String.format(SAY_DATE,
                 DATE_FORMAT.format(calendar.getTime()),
                 TIME_FORMAT.format(calendar.getTime()));
+    }
+
+    public static boolean isCurrentMessage(Message message){
+        if(!message.getEmbeds().isEmpty()){
+            MessageEmbed embed = message.getEmbeds().get(0);
+            return AnnonceGenerator.getMessage().equals(embed.getTitle());
+        }
+        return true;
     }
 
     public static MessageEmbed getAnnonce(Data data, TextChannel textChannel){

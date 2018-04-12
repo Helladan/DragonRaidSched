@@ -27,33 +27,19 @@ public class EventRunable implements Runnable{
     public void run() {
         try {
             Info info = data.getInfos().get(textChannel.getId());
-            RequestFuture<List<Message>> historyRequest = textChannel.getHistory().retrievePast(100).submit();
+            List<Message> messages = textChannel.getHistory().retrievePast(100).submit().get();
             User me = textChannel.getJDA().getSelfUser();
-            do {
-                Thread.sleep(1000);
-            } while (!historyRequest.isDone());
-            for (Message message : historyRequest.get()) {
-                if(!message.getAuthor().equals(me) || isCurrentMessage(message)) {
+            for (Message message : messages) {
+                if(!message.getAuthor().equals(me)) {
                     textChannel.deleteMessageById(message.getId()).submit();
                 }
             }
             info.setTarget(null);
             info.setMode(null);
             info.setIsPresent(new ArrayList<>());
-            RequestFuture<Message> request = textChannel.sendMessage(AnnonceGenerator.getAnnonce(data, textChannel)).submit();
-            do {
-                Thread.sleep(1000);
-            } while (!request.isDone());
-            info.setAnnonceId(request.get().getId());
+            info.setAnnonceId(textChannel.sendMessage(AnnonceGenerator.getAnnonce(data, textChannel)).submit().get().getId());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace(System.err);
         }
-    }
-    private boolean isCurrentMessage(Message message){
-        if(!message.getEmbeds().isEmpty()){
-            MessageEmbed embed = message.getEmbeds().get(0);
-            return AnnonceGenerator.getMessage().equals(embed.getTitle());
-        }
-        return true;
     }
 }
