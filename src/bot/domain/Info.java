@@ -15,4 +15,8 @@ public class Info implements Serializable {
     private List<String> reserve = new ArrayList<>();
     private String mode;
     private String target;
+    private int dayOfWeek;
+    private int hour;
+    private int minute;
+    private int time;
 }

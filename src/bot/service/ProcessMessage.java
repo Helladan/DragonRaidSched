@@ -3,6 +3,9 @@ package bot.service;
 import bot.domain.Commande;
 import bot.domain.Data;
 import bot.domain.Info;
+import bot.domain.Messages;
+import bot.domain.Mode;
+import bot.domain.Cible;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
@@ -10,196 +13,314 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.requests.RestAction;
+import scheduler.EventScheduler;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
+import javax.print.attribute.standard.RequestingUserName;
+
+import org.omg.CORBA.CODESET_INCOMPATIBLE;
+
 public class ProcessMessage {
-    private final static List<String> PRESENT = new ArrayList<>(Arrays.asList("p", "present", "présent"));
-    private final static List<String> RESERVE = new ArrayList<>(Arrays.asList("r", "reserve", "réserve"));
-    private final static List<String> NON_PRESENT = new ArrayList<>(Arrays.asList("np", "non-present", "non-présent"));
-    private final static String MODE = "/m";
-    private final static String TARGET = "/t";
-    private final static String RAID_LEAD = "/rl";
+	private final static List<String> PRESENT = new ArrayList<>(Arrays.asList("/p", "/present", "/présent"));
+	private final static List<String> RESERVE = new ArrayList<>(Arrays.asList("/r", "/reserve", "/réserve"));
+	private final static List<String> NON_PRESENT = new ArrayList<>(
+			Arrays.asList("/np", "/non-present", "/non-présent"));
+	private final static String MODE = "/m";
+	private final static String TARGET = "/t";
+	private final static String RAID_LEAD = "/rl";
+	private final static String HELP = "/help";
+	private final static String START = "/start";
 
+	private final static String LUNDI = "lundi";
+	private final static String MARDI = "mardi";
+	private final static String MERCREDI = "mercredi";
+	private final static String JEUDI = "jeudi";
+	private final static String VENDREDI = "vendredi";
+	private final static String SAMEDI = "samedi";
+	private final static String DIMANCHE = "dimanche";
 
-    public static boolean process(MessageReceivedEvent event, Data data) {
-        RestAction<PrivateChannel> privateChannel = event.getAuthor().openPrivateChannel();
-        Info info = data.getInfos().get(event.getTextChannel().getId());
-        if(info == null){
-            info = new Info();
-            data.getInfos().put(event.getTextChannel().getId(), info);
-        }
-        if (info.getAnnonceId() != null) {
-            Message message = event.getMessage();
-            String pseudo = event.getAuthor().getName();
-            if(info.getIsPresent() == null){
-                info.setIsPresent(new ArrayList<>());
-            }
-            String contentDisplay = message.getContentDisplay();
-            if(isCommande(contentDisplay.toLowerCase())){
-                Commande commande = getCommande(contentDisplay.toLowerCase());
-                switch (commande){
-                    case PRESENT:
-                        if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
-                            addPlayer(pseudo, info, privateChannel);
-                            return sortAndRefrech(info);
-                        } else {
-                            privateChannel.complete().sendMessage("T'es qui ?!").submit();
-                        }
-                        break;
-                    case RESERVE:
-                        if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
-                            addReserve(pseudo, info);
-                            return sortAndRefrech(info);
-                        } else {
-                            privateChannel.complete().sendMessage("T'es qui ?!").submit();
-                        }
-                        break;
-                    case NON_PRESENT:
-                        if(info.getIsPresent().contains(pseudo) || info.getReserve().contains(pseudo)){
-                            removePlayer(pseudo, info);
-                            return sortAndRefrech(info);
-                        }else{
-                            privateChannel.complete().sendMessage("Tu été pas compté de toutes maniére").submit();
-                        }
-                        break;
-                    case MODE:
-                    case TARGET:
-                    case RAID_LEAD:
-                        return applyCommande(event, privateChannel, info, commande);
-                }
-            }else if (isInscription(contentDisplay.toLowerCase())){
-                List<Emote> emotes = message.getEmotes();
-                String classes = "";
-                for (Emote emote : emotes) {
-                    classes += emote.getAsMention();
-                }
-                data.getPlayerMap().put(pseudo, classes);
-                addPlayer(pseudo, info, privateChannel);
-                return true;
-            }else{
-                privateChannel.complete().sendMessage("Arrete de raconter de la merde !").submit();
-            }
-        } else {
-            privateChannel.complete().sendMessage("Aucune annonce n'a été faites ici connard !").submit();
-        }
-        return false;
-    }
+	public static boolean process(MessageReceivedEvent event, Data data) {
+		RestAction<PrivateChannel> privateChannel = event.getAuthor().openPrivateChannel();
+		Info info = data.getInfos().get(event.getTextChannel().getId());
+		if (info == null) {
+			info = new Info();
+			data.getInfos().put(event.getTextChannel().getId(), info);
+		}
+		String pseudo = event.getAuthor().getName();
+		Message message = event.getMessage();
+		String contentDisplay = message.getContentDisplay();
+		if (isCommande(contentDisplay.toLowerCase())) {
+			Commande commande = getCommande(contentDisplay.toLowerCase());
+			if (info.getAnnonceId() != null || Commande.START.equals(commande)) {
+				if (info.getIsPresent() == null) {
+					info.setIsPresent(new ArrayList<>());
+				}
+				switch (commande) {
+				case PRESENT:
+					if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
+						addPlayer(pseudo, info, privateChannel);
+						return sortAndRefrech(info);
+					} else {
+						privateChannel.complete().sendMessage(Messages.INSCRITPION.getMessage()).submit();
+					}
+					break;
+				case RESERVE:
+					if (data.getPlayerMap().containsKey(message.getAuthor().getName())) {
+						addReserve(pseudo, info);
+						return sortAndRefrech(info);
+					} else {
+						privateChannel.complete().sendMessage(Messages.INSCRITPION.getMessage()).submit();
+					}
+					break;
+				case NON_PRESENT:
+					if (info.getIsPresent().contains(pseudo) || info.getReserve().contains(pseudo)) {
+						removePlayer(pseudo, info);
+						return sortAndRefrech(info);
+					} else {
+						privateChannel.complete().sendMessage(Messages.NO_INSCRIPTION.getMessage()).submit();
+					}
+					break;
+				case MODE:
+				case TARGET:
+				case RAID_LEAD:
+				case START:
+					return applyCommande(event, privateChannel, data, commande);
+				case HELP:
+					String msg = "";
+					String param = getParams(contentDisplay);
+					if (param != null) {
+						param = param.toLowerCase();
+						Commande helpCommande = getCommande(param);
+						if(helpCommande != null) {
+							switch (helpCommande) {
+							case MODE:
+								msg += "mode de jeu.\nPeux prendre n'importe quel texte, mais ceux-ci sont reconu :\n";
+								for(Mode mode : Mode.values()) {
+									msg += " - " + mode.name() + " (" + mode.getNom() + ")\n";
+								}
+								break;
+							case TARGET:
+								msg += "cible du Raid.\nPeux prendre n'importe quel texte, mais ceux-ci sont reconu :\n";
+								for(Cible cible : Cible.values()) {
+									msg += " - " + cible.name() + " (" + cible.getNom() + ")\n";
+								}
+								break;
+							case START:
+								msg += "set le jour des raid.\nFormat : \n" + Messages.START.getMessage();
+								break;
+							default:
+								msg += "pas d'explication particuliére sur cette commande.";
+							}
+						} else {
+							privateChannel.complete().sendMessage(Messages.MAUVAISE_COMMANDE.getMessage()).submit();
+						}
+					} else {
+						msg += "/p, /present ou /présent : s'inscrire pour le Raid\n"
+								+ "/r,/reserve ou /réserve : s'inscrire en reserve\n"
+								+ "/np, /non-present ou /non-présent : se désinscrire\n" + HELP
+								+ " : afficher l'aide\n";
+						if (hasPermition(event)) {
+							msg += START + " : regler le moment de l'evenement sur le canal\n" + MODE + " : mode de jeu\n"
+									+ TARGET + " : cible du raid\n" + RAID_LEAD + " : ce marquer comme raid lead";
+						}
+					}
+					privateChannel.complete().sendMessage(msg).submit();
+					return false;
+				}
+			} else {
+				String msg = Messages.NOT_START.getMessage();
+				if (hasPermition(event)) {
+					msg += "\n" + Messages.START.getMessage();
+				}
+				privateChannel.complete().sendMessage(msg).submit();
+			}
+		} else if (isInscription(contentDisplay.toLowerCase())) {
+			List<Emote> emotes = message.getEmotes();
+			String classes = "";
+			for (Emote emote : emotes) {
+				classes += emote.getAsMention();
+			}
+			data.getPlayerMap().put(pseudo, classes);
+			addPlayer(pseudo, info, privateChannel);
+			return true;
+		} else {
+			String msg = Messages.MAUVAISE_COMMANDE.getMessage();
+			msg += "\n" + Messages.TAPE_HELP.getMessage();
+			privateChannel.complete().sendMessage(msg).submit();
+		}
+		return false;
+	}
 
-    private static boolean sortAndRefrech(Info info) {
-        info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
-        return true;
-    }
+	private static boolean sortAndRefrech(Info info) {
+		info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
+		return true;
+	}
 
-    private static boolean isInscription(String message) {
-        Pattern pattern = Pattern.compile("[:[a-z|_]*:[ ]*]*");
-        return pattern.matcher(message).matches();
-    }
+	private static boolean isInscription(String message) {
+		Pattern pattern = Pattern.compile("(:.*: *)*");
+		return pattern.matcher(message).matches();
+	}
 
-    private static Commande getCommande(String message){
-        message = message.split(" ")[0];
-        if(PRESENT.contains(message)){
-            return Commande.PRESENT;
-        }
-        if(NON_PRESENT.contains(message)){
-            return Commande.NON_PRESENT;
-        }
-        if(RESERVE.contains(message)){
-            return Commande.RESERVE;
-        }
-        if (message.equals(MODE)){
-            return Commande.MODE;
-        }
-        if (message.equals(TARGET)){
-            return Commande.TARGET;
-        }
-        if (message.equals(RAID_LEAD)){
-            return Commande.RAID_LEAD;
-        }
-        return null;
-    }
+	private static Commande getCommande(String message) {
+		message = message.split(" ")[0];
+		if (PRESENT.contains(message)) {
+			return Commande.PRESENT;
+		}
+		if (NON_PRESENT.contains(message)) {
+			return Commande.NON_PRESENT;
+		}
+		if (RESERVE.contains(message)) {
+			return Commande.RESERVE;
+		}
+		if (message.equals(START)) {
+			return Commande.START;
+		}
+		if (message.equals(MODE)) {
+			return Commande.MODE;
+		}
+		if (message.equals(TARGET)) {
+			return Commande.TARGET;
+		}
+		if (message.equals(RAID_LEAD)) {
+			return Commande.RAID_LEAD;
+		}
+		if (message.equals(HELP)) {
+			return Commande.HELP;
+		}
+		return null;
+	}
 
-    private static void addPlayer(String pseudo, Info info, RestAction<PrivateChannel> privateChannel) {
-        List<String> isPresent = info.getIsPresent();
-        List<String> reserve = info.getReserve();
-        if(!isPresent.contains(pseudo)) {
-            isPresent.add(pseudo);
-            reserve.remove(pseudo);
-            if(isPresent.size() > 10){
-                privateChannel.complete().sendMessage("10 personnes sont déjà inscrites, tu seras sur le banc de touche").submit();
-            }
-        }
-    }
-    private static void addReserve(String pseudo, Info info) {
-        List<String> isPresent = info.getIsPresent();
-        List<String> reserve = info.getReserve();
-        if(!reserve.contains(pseudo)){
-            isPresent.remove(pseudo);
-            reserve.add(pseudo);
-        }
-    }
-    private static void removePlayer(String pseudo, Info info) {
-        List<String> isPresent = info.getIsPresent();
-        List<String> reserve = info.getReserve();
-        isPresent.remove(pseudo);
-        reserve.remove(pseudo);
-    }
+	private static void addPlayer(String pseudo, Info info, RestAction<PrivateChannel> privateChannel) {
+		List<String> isPresent = info.getIsPresent();
+		List<String> reserve = info.getReserve();
+		if (!isPresent.contains(pseudo)) {
+			isPresent.add(pseudo);
+			reserve.remove(pseudo);
+			if (isPresent.size() > 10) {
+				privateChannel.complete().sendMessage(Messages.OVERFLOW.getMessage()).submit();
+			}
+		}
+	}
 
-    private static boolean isCommande(String message){
-        return getCommande(message) != null;
-    }
+	private static void addReserve(String pseudo, Info info) {
+		List<String> isPresent = info.getIsPresent();
+		List<String> reserve = info.getReserve();
+		if (!reserve.contains(pseudo)) {
+			isPresent.remove(pseudo);
+			reserve.add(pseudo);
+		}
+	}
 
-    private static String getParams(String message){
-        return (message.split(" ").length > 1?message.substring(message.split(" ")[0].length() + 1):null);
-    }
+	private static void removePlayer(String pseudo, Info info) {
+		List<String> isPresent = info.getIsPresent();
+		List<String> reserve = info.getReserve();
+		isPresent.remove(pseudo);
+		reserve.remove(pseudo);
+	}
 
-    private static boolean applyCommande(MessageReceivedEvent event, RestAction<PrivateChannel> privateChannel, Info info, Commande commande){
+	private static boolean isCommande(String message) {
+		return getCommande(message) != null;
+	}
 
-        if(hasPermition(event)){
-            String message = event.getMessage().getContentDisplay();
-            String params = getParams(message);
-            switch (commande) {
-                case TARGET:
-                    info.setTarget(params);
-                    break;
-                case MODE:
-                    info.setMode(params);
-                    break;
-                case RAID_LEAD:
-                    if (params != null && !"".equals(params)) {
-                        info.setRaidEmote(event.getMessage().getEmotes().get(0).getAsMention());
-                        info.setRaidLead(event.getAuthor().getName());
-                    } else{
-                        info.setRaidEmote(null);
-                        info.setRaidLead(null);
-                    }
-                    break;
-            }
-            return true;
-        }else{
-            privateChannel.complete().sendMessage("Touche pas à ça petit con !").submit();
-        }
-        return false;
-    }
-    private static boolean hasPermition(MessageReceivedEvent event){
-        return event.getMember().getPermissions(event.getTextChannel()).contains(Permission.MESSAGE_MANAGE);
-    }
+	private static String getParams(String message) {
+		return (message.split(" ").length > 1 ? message.substring(message.split(" ")[0].length() + 1) : null);
+	}
 
-    @AllArgsConstructor
-    private static class RaidLeadFirst implements Comparator<String> {
+	private static boolean applyCommande(MessageReceivedEvent event, RestAction<PrivateChannel> privateChannel,
+			Data data, Commande commande) {
+		Info info = data.getInfos().get(event.getTextChannel().getId());
 
-        String readLead;
+		if (hasPermition(event)) {
+			String message = event.getMessage().getContentDisplay();
+			String params = getParams(message);
+			switch (commande) {
+			case TARGET:
+				info.setTarget(params);
+				break;
+			case MODE:
+				info.setMode(params);
+				break;
+			case RAID_LEAD:
+				if (params != null && !"".equals(params)) {
+					info.setRaidEmote(event.getMessage().getEmotes().get(0).getAsMention());
+					info.setRaidLead(event.getAuthor().getName());
+				} else {
+					info.setRaidEmote(null);
+					info.setRaidLead(null);
+				}
+				break;
+			case START:
+				String paramTabs[] = params.split(" ");
+				if (paramTabs.length == 3 && paramTabs[1].split(":").length == 2) {
+					switch (paramTabs[0]) {
+					case LUNDI:
+						info.setDayOfWeek(Calendar.MONDAY);
+						break;
 
-        @Override
-        public int compare(String o1, String o2) {
-            if(o1.equals(readLead)){
-                return -1;
-            }
-            if (o2.equals(readLead)){
-                return 1;
-            }
-            return 0;
-        }
-    }
+					case MARDI:
+						info.setDayOfWeek(Calendar.TUESDAY);
+						break;
+
+					case MERCREDI:
+						info.setDayOfWeek(Calendar.WEDNESDAY);
+						break;
+
+					case JEUDI:
+						info.setDayOfWeek(Calendar.THURSDAY);
+						break;
+
+					case VENDREDI:
+						info.setDayOfWeek(Calendar.FRIDAY);
+						break;
+
+					case SAMEDI:
+						info.setDayOfWeek(Calendar.SATURDAY);
+						break;
+					case DIMANCHE:
+						info.setDayOfWeek(Calendar.SUNDAY);
+						break;
+					default:
+						break;
+					}
+					String time[] = paramTabs[1].split(":");
+					info.setHour(Integer.parseInt(time[0]));
+					info.setMinute(Integer.parseInt(time[1]));
+					info.setTime(Integer.parseInt(paramTabs[2]));
+					EventScheduler.update(data, event.getJDA().getGuilds());
+				} else {
+					privateChannel.complete()
+							.sendMessage(Messages.MAUVAISE_COMMANDE.getMessage() + "\n" + Messages.START.getMessage())
+							.submit();
+				}
+				break;
+			}
+			return true;
+		} else {
+			privateChannel.complete().sendMessage(Messages.DROIT.getMessage()).submit();
+		}
+		return false;
+	}
+
+	private static boolean hasPermition(MessageReceivedEvent event) {
+		return event.getMember().getPermissions(event.getTextChannel()).contains(Permission.MESSAGE_MANAGE);
+	}
+
+	@AllArgsConstructor
+	private static class RaidLeadFirst implements Comparator<String> {
+
+		String readLead;
+
+		@Override
+		public int compare(String o1, String o2) {
+			if (o1.equals(readLead)) {
+				return -1;
+			}
+			if (o2.equals(readLead)) {
+				return 1;
+			}
+			return 0;
+		}
+	}
 }

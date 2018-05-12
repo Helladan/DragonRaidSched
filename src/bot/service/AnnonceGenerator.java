@@ -29,17 +29,17 @@ public class AnnonceGenerator {
     private final static String SAY_NB_RESERVE = "   *%s en reserve*";
 
 
-    public static String getMessage() {
-        Calendar calendar = EventScheduler.getNextSchedul();
+    public static String getMessage(Info info) {
+        Calendar calendar = EventScheduler.getNextSchedul(info);
         return String.format(SAY_DATE,
                 DATE_FORMAT.format(calendar.getTime()),
                 TIME_FORMAT.format(calendar.getTime()));
     }
 
-    public static boolean isCurrentMessage(Message message){
+    public static boolean isCurrentMessage(Message message, Info info){
         if(!message.getEmbeds().isEmpty()){
             MessageEmbed embed = message.getEmbeds().get(0);
-            return AnnonceGenerator.getMessage().equals(embed.getTitle());
+            return AnnonceGenerator.getMessage(info).equals(embed.getTitle());
         }
         return true;
     }
@@ -61,7 +61,7 @@ public class AnnonceGenerator {
             }
             description = format(SAY_TARGET, description);
         }
-        annonceBuilder.setTitle(getMessage(), cible!=null?cible.getTutoUrl():null);
+        annonceBuilder.setTitle(getMessage(info), cible!=null?cible.getTutoUrl():null);
         int presentSize = info.getIsPresent().size();
         int reserveSize = info.getReserve().size();
         description += format(SAY_NB_INSCRIT, presentSize + "/10", presentSize >1?"s":"");

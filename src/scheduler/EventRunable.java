@@ -24,7 +24,12 @@ public class EventRunable implements Runnable{
     @Override
     public void run() {
         try {
+        	Info oldInfo =  data.getInfos().get(textChannel.getId());
             Info info = new Info();
+            info.setDayOfWeek(oldInfo.getDayOfWeek());
+            info.setHour(oldInfo.getHour());
+            info.setMinute(oldInfo.getMinute());
+            info.setTime(oldInfo.getTime());
             data.getInfos().put(textChannel.getId(), info);
             info.setAnnonceId(textChannel.sendMessage(AnnonceGenerator.getAnnonce(data, textChannel)).submit().get().getId());
         } catch (InterruptedException | ExecutionException e) {
