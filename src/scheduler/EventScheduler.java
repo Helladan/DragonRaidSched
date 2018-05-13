@@ -2,48 +2,62 @@ package scheduler;
 
 import bot.domain.Data;
 import bot.domain.Info;
+import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
-import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class EventScheduler {
-    // 2 Heures
-    private static final Integer END_EVENT = 2 * 60 * 60 * 1000;
+	// 7 Jours
+	private final static int PERIOD = 7 * 24 * 60 * 60 * 1000;
 
-    private ScheduledExecutorService executor;
+	private static ScheduledExecutorService executor;
 
+	public static void update(Data data, List<Guild> guilds) {
+		if (executor != null) {
+			executor.shutdown();
+		}
+		executor = Executors.newScheduledThreadPool(data.getInfos().size() + 1);
+		executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
+		for (String textChannelId : data.getInfos().keySet()) {
+			Info info = data.getInfos().get(textChannelId);
+			if (info.getDayOfWeek() != 0) {
+				Calendar schedul = getNextSchedul(info);
 
-    public EventScheduler(TextChannel textChannel, Data data) {
-        Info info = data.getInfos().get(textChannel.getId());
-        executor = Executors.newScheduledThreadPool(2);
-        Calendar schedul = getNextSchedul();
+				long initialDelay = schedul.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()
+						+ info.getTime();
 
+				TextChannel textChannel = null;
+				for (Guild guild : guilds) {
+					textChannel = guild.getTextChannelById(textChannelId);
+					if (textChannel != null) {
+						break;
+					}
+				}
 
-        // 7 Jours
-        int period = 7 * 24 * 60 * 60 * 1000;
-        long initialDelay = schedul.getTimeInMillis() - Calendar.getInstance().getTimeInMillis() + END_EVENT;
+				if (textChannel != null) {
+					executor.scheduleAtFixedRate(new EventRunable(data, textChannel), initialDelay, PERIOD,
+							TimeUnit.MILLISECONDS);
+				} else {
+					data.getInfos().remove(textChannelId);
+				}
+			}
+		}
+	}
 
-        executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
-        executor.scheduleAtFixedRate(new EventRunable(data, textChannel),
-                initialDelay,
-                period,
-                TimeUnit.MILLISECONDS);
-    }
-
-    public static Calendar getNextSchedul() {
-        Calendar schedul = Calendar.getInstance();
-        schedul.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-        schedul.set(Calendar.HOUR_OF_DAY, 21);
-        schedul.clear(Calendar.MINUTE);
-        schedul.clear(Calendar.SECOND);
-        schedul.clear(Calendar.MILLISECOND);
-        if(Calendar.getInstance().getTimeInMillis() > (schedul.getTimeInMillis() + END_EVENT - 10000)){
-            schedul.add(Calendar.DAY_OF_WEEK, 7);
-        }
-        return schedul;
-    }
+	public static Calendar getNextSchedul(Info info) {
+		Calendar schedul = Calendar.getInstance();
+		schedul.set(Calendar.DAY_OF_WEEK, info.getDayOfWeek());
+		schedul.set(Calendar.HOUR_OF_DAY, info.getHour());
+		schedul.set(Calendar.MINUTE, info.getMinute());
+		schedul.clear(Calendar.SECOND);
+		schedul.clear(Calendar.MILLISECOND);
+		if (Calendar.getInstance().getTimeInMillis() > (schedul.getTimeInMillis() + info.getTime() - 10000)) {
+			schedul.add(Calendar.DAY_OF_WEEK, 7);
+		}
+		return schedul;
+	}
 }
