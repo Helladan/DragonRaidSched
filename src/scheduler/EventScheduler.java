@@ -22,7 +22,7 @@ public class EventScheduler {
 		}
 		executor = Executors.newScheduledThreadPool(data.getInfos().size() + 1);
 		executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
-		for (String textChannelId : data.getInfos().keySet()) {
+		for (String textChannelId : new HashSet<>(data.getInfos().keySet())) {
 			Info info = data.getInfos().get(textChannelId);
 			if (info.getDayOfWeek() != 0) {
 				Calendar schedul = getNextSchedul(info);
