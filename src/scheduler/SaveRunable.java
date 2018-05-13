@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
 public class SaveRunable implements Runnable {
-    public final static String DATA_FILE = "../save/data.sav";
+    public final static String DATA_FILE = "save/data.sav";
 
     Data data;
 
@@ -18,8 +18,7 @@ public class SaveRunable implements Runnable {
     @Override
     public void run() {
         try {
-            File file = new File(DATA_FILE);
-            FileOutputStream fos = new FileOutputStream(file);
+            FileOutputStream fos = new FileOutputStream(new File(DATA_FILE));
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(data);
             oos.close();
