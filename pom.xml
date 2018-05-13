@@ -15,6 +15,11 @@
                 <configuration>
                     <source>9</source>
                     <target>9</target>
+                    <archive>
+                        <manifest>
+                            <mainClass>DragonRaidSched</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
