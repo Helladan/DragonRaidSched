@@ -18,7 +18,7 @@
                     <archive>
                         <manifest>
 			    <addClasspath>true</addClasspath>
-                            <mainClass>.DragonRaidSched</mainClass>
+                            <mainClass>com.guildwars2.dragonEtherer.DragonRaidSched</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
