@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
 public class SaveRunable implements Runnable {
-    public final static String DATA_FILE = "save/data.sav";
+    public final static String DATA_FILE = "../save/data.sav";
 
     Data data;
 
