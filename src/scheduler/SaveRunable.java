@@ -18,7 +18,7 @@ public class SaveRunable implements Runnable {
     @Override
     public void run() {
         try {
-            File file = file = new File(DATA_FILE);
+            File file = new File(DATA_FILE);
             FileOutputStream fos = new FileOutputStream(file);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(data);
