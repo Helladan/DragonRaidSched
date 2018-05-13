@@ -17,7 +17,8 @@
                     <target>9</target>
                     <archive>
                         <manifest>
-                            <mainClass>src.DragonRaidSched</mainClass>
+			    <addClasspath>true</addClasspath>
+                            <mainClass>DragonRaidSched</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
