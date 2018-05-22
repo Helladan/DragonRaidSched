@@ -53,8 +53,10 @@ public class DataPersist {
 		Transaction tx = session.beginTransaction();
 		Data data = new Data();
 		try {
-			Query<Data> query = session.createQuery("from Data");
-			List<Data> list = query.list();
+			Query<Data> queryData = session.createQuery("from Data");
+			Query<Data> queryInfo = session.createQuery("from Info");
+			List<Data> list = queryData.list();
+			System.out.println(queryInfo.list());
 			System.out.println(list);
 			if(!list.isEmpty()) {
 				data = list.get(0);
