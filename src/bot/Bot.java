@@ -1,6 +1,7 @@
 package bot;
 
 import bot.domain.*;
+import bot.presistance.DataPersist;
 import bot.service.AnnonceGenerator;
 import bot.service.ProcessMessage;
 import net.dv8tion.jda.core.AccountType;
@@ -85,13 +86,7 @@ public class Bot {
 	}
 
 	private void retriveSave() throws IOException, ClassNotFoundException, ExecutionException, InterruptedException {
-		File file = new File(SaveRunable.DATA_FILE);
-		if (file.exists()) {
-			FileInputStream fis = fis = new FileInputStream(file);
-			ObjectInputStream ois = ois = new ObjectInputStream(fis);
-			data = ((Data) ois.readObject());
-			ois.close();
-		}
+		data = DataPersist.retrive();
 	}
 
 	private Message getMessageById(TextChannel textChannel, String id) {

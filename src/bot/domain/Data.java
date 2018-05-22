@@ -4,10 +4,18 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-@lombok.Data
-public class Data implements Serializable {
-    private static final long serialVersionUID = 4503589453989765124L;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
+
+@lombok.Data
+@Entity
+public class Data implements Serializable {
+	@Id
+	private Long id;
+    @ElementCollection
     private Map<String, String> playerMap = new HashMap<>();
+    @ElementCollection
     private Map<String, Info> infos = new HashMap<>();
 }

@@ -1,6 +1,8 @@
 package scheduler;
 
 import bot.domain.Data;
+import bot.domain.Info;
+import bot.presistance.DataPersist;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,13 +19,6 @@ public class SaveRunable implements Runnable {
 
     @Override
     public void run() {
-        try {
-            FileOutputStream fos = new FileOutputStream(new File(DATA_FILE));
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(data);
-            oos.close();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
+        DataPersist.save(data);
     }
 }
