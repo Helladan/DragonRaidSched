@@ -55,6 +55,7 @@ public class DataPersist {
 		try {
 			Query<Data> query = session.createQuery("from Data");
 			List<Data> list = query.list();
+			System.out.println(list);
 			if(!list.isEmpty()) {
 				data = list.get(0);
 			}
