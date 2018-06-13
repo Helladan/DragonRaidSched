@@ -117,13 +117,15 @@ public class ProcessMessage {
 							privateChannel.complete().sendMessage(Messages.MAUVAISE_COMMANDE.getMessage()).submit();
 						}
 					} else {
-						msg += "/p, /present ou /présent : s'inscrire pour le Raid\n"
-								+ "/r,/reserve ou /réserve : s'inscrire en reserve\n"
-								+ "/np, /non-present ou /non-présent : se désinscrire\n" + HELP
-								+ " : afficher l'aide\n";
+						msg += String.join(" ou ", PRESENT) + " : s'inscrire pour le Raid\n"
+								+ String.join(" ou ", RESERVE) + " : s'inscrire en reserve\n"
+								+ String.join(" ou ", NON_PRESENT) + " : se désinscrire\n" 
+								+ HELP + " : afficher l'aide\n";
 						if (hasPermition(event)) {
-							msg += START + " : regler le moment de l'evenement sur le canal\n" + MODE + " : mode de jeu\n"
-									+ TARGET + " : cible du raid\n" + RAID_LEAD + " : ce marquer comme raid lead";
+							msg += START + " : regler le moment de l'evenement sur le canal\n"
+								+ MODE + " : mode de jeu\n"
+								+ TARGET + " : cible du raid\n" 
+								+ RAID_LEAD + " : ce marquer comme raid lead";
 						}
 					}
 					privateChannel.complete().sendMessage(msg).submit();
@@ -250,6 +252,7 @@ public class ProcessMessage {
 					info.setRaidEmote(null);
 					info.setRaidLead(null);
 				}
+				info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
 				break;
 			case START:
 				String paramTabs[] = params.split(" ");
