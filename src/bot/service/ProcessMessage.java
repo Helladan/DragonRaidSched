@@ -31,8 +31,8 @@ public class ProcessMessage {
 	private final static String MODE = START_CMD + "m";
 	private final static String TARGET = START_CMD + "t";
 	private final static String RAID_LEAD = START_CMD + "rl";
-	private final static String HELP = START_CMD + "help";
-	private final static String START = START_CMD + "start";
+	public final static String HELP = START_CMD + "help";
+	public final static String START = START_CMD + "start";
 
 	private final static String LUNDI = "lundi";
 	private final static String MARDI = "mardi";
