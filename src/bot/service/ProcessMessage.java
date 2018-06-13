@@ -23,15 +23,16 @@ import javax.print.attribute.standard.RequestingUserName;
 import org.omg.CORBA.CODESET_INCOMPATIBLE;
 
 public class ProcessMessage {
-	private final static List<String> PRESENT = new ArrayList<>(Arrays.asList("/p", "/present", "/présent"));
-	private final static List<String> RESERVE = new ArrayList<>(Arrays.asList("/r", "/reserve", "/réserve"));
+	private final static String START_CMD = "/";
+	private final static List<String> PRESENT = new ArrayList<>(Arrays.asList(START_CMD + "p", START_CMD + "present", START_CMD + "présent"));
+	private final static List<String> RESERVE = new ArrayList<>(Arrays.asList(START_CMD + "r", START_CMD + "reserve", START_CMD + "réserve"));
 	private final static List<String> NON_PRESENT = new ArrayList<>(
-			Arrays.asList("/np", "/non-present", "/non-présent"));
-	private final static String MODE = "/m";
-	private final static String TARGET = "/t";
-	private final static String RAID_LEAD = "/rl";
-	private final static String HELP = "/help";
-	private final static String START = "/start";
+			Arrays.asList(START_CMD + "np", START_CMD + "non-present", START_CMD + "non-présent"));
+	private final static String MODE = START_CMD + "m";
+	private final static String TARGET = START_CMD + "t";
+	private final static String RAID_LEAD = START_CMD + "rl";
+	private final static String HELP = START_CMD + "help";
+	private final static String START = START_CMD + "start";
 
 	private final static String LUNDI = "lundi";
 	private final static String MARDI = "mardi";
