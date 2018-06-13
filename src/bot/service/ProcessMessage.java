@@ -23,7 +23,7 @@ import javax.print.attribute.standard.RequestingUserName;
 import org.omg.CORBA.CODESET_INCOMPATIBLE;
 
 public class ProcessMessage {
-	private final static String START_CMD = "/";
+	private final static String START_CMD = "$";
 	private final static List<String> PRESENT = new ArrayList<>(Arrays.asList(START_CMD + "p", START_CMD + "present", START_CMD + "présent"));
 	private final static List<String> RESERVE = new ArrayList<>(Arrays.asList(START_CMD + "r", START_CMD + "reserve", START_CMD + "réserve"));
 	private final static List<String> NON_PRESENT = new ArrayList<>(
