@@ -5,13 +5,13 @@
 <hibernate-configuration>
 	<session-factory>
 		<property name="hibernate.connection.url">
-			jdbc:postgresql://ec2-54-228-181-43.eu-west-1.compute.amazonaws.com:5432/dco2tg3ishgd2e?ssl=require&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory
+			jdbc:postgresql://ec2-79-125-6-160.eu-west-1.compute.amazonaws.com:5432/d98fr0eqrupgop?ssl=require&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory
 		</property>
 		<property name="hibernate.connection.username">
-			wbmvxkqebmydre
+			tsaonhtxnlciqg
 		</property>
 		<property name="hibernate.connection.password">
-			c0c0d43f73b7398c0910c09eaaacf58b3ba30052332127f84301d29714a06886
+			bc2c29fbf374dfce1922b4f11de07cd5d83113173ee92572e48251ab5f7ac3f7
 		</property>
 		<property name="hibernate.connection.driver_class">
 			org.postgresql.Driver

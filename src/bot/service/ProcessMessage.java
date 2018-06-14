@@ -34,12 +34,12 @@ public class ProcessMessage {
 	public final static String HELP = START_CMD + "help";
 	public final static String START = START_CMD + "start";
 
-	private final static String LUNDI = "lundi";
-	private final static String MARDI = "mardi";
+	private final static String LUNDI    = "lundi";
+	private final static String MARDI    = "mardi";
 	private final static String MERCREDI = "mercredi";
-	private final static String JEUDI = "jeudi";
+	private final static String JEUDI    = "jeudi";
 	private final static String VENDREDI = "vendredi";
-	private final static String SAMEDI = "samedi";
+	private final static String SAMEDI   = "samedi";
 	private final static String DIMANCHE = "dimanche";
 
 	public static boolean process(MessageReceivedEvent event, Data data) {
