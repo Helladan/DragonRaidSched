@@ -6,9 +6,12 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class EventScheduler {
 	// 7 Jours
@@ -20,10 +23,12 @@ public class EventScheduler {
 		if (executor != null) {
 			executor.shutdown();
 		}
-		executor = Executors.newScheduledThreadPool(data.getInfos().size() + 1);
+		Supplier<Stream<Entry<String, Info>>> infoSupplier = () -> data.getInfos().entrySet().stream().filter(entry -> entry.getValue().getTime()==0);
+		executor = Executors.newScheduledThreadPool((int) (infoSupplier.get().count() + 1));
 		executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
-		for (String textChannelId : new HashSet<>(data.getInfos().keySet())) {
-			Info info = data.getInfos().get(textChannelId);
+		infoSupplier.get().forEach(entry -> {
+			String textChannelId = entry.getKey();
+			Info info = entry.getValue();
 			if (info.getDayOfWeek() != 0) {
 				Calendar schedul = getNextSchedul(info);
 
@@ -45,7 +50,7 @@ public class EventScheduler {
 					data.getInfos().remove(textChannelId);
 				}
 			}
-		}
+		});
 	}
 
 	public static Calendar getNextSchedul(Info info) {

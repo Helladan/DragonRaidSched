@@ -23,6 +23,7 @@ import javax.print.attribute.standard.RequestingUserName;
 import org.omg.CORBA.CODESET_INCOMPATIBLE;
 
 public class ProcessMessage {
+	private static final String START_SINGLETON_MODE = "-s ";
 	private final static String START_CMD = "$";
 	private final static List<String> PRESENT = new ArrayList<>(Arrays.asList(START_CMD + "p", START_CMD + "present", START_CMD + "présent"));
 	private final static List<String> RESERVE = new ArrayList<>(Arrays.asList(START_CMD + "r", START_CMD + "reserve", START_CMD + "réserve"));
@@ -33,7 +34,7 @@ public class ProcessMessage {
 	private final static String RAID_LEAD = START_CMD + "rl";
 	public final static String HELP = START_CMD + "help";
 	public final static String START = START_CMD + "start";
-
+	
 	private final static String LUNDI    = "lundi";
 	private final static String MARDI    = "mardi";
 	private final static String MERCREDI = "mercredi";
@@ -41,6 +42,12 @@ public class ProcessMessage {
 	private final static String VENDREDI = "vendredi";
 	private final static String SAMEDI   = "samedi";
 	private final static String DIMANCHE = "dimanche";
+	
+	public final static String START_REGEX_DAYS = "(" + LUNDI + "|" + MARDI + "|" + MERCREDI + "|" + JEUDI + "|" + VENDREDI + "|" + SAMEDI + "|" + DIMANCHE + ")";
+	public final static String START_REGEX_HOURS = "[0-9]{1,2}:[0-9]{2}";
+	public final static String START_REGEX_BASE = START_REGEX_DAYS + " " + START_REGEX_HOURS;
+	public final static String START_REGEX = "(-s " + START_REGEX_BASE + ")|(" + START_REGEX_BASE + " [1-9][0-9]*)";
+
 
 	public static boolean process(MessageReceivedEvent event, Data data) {
 		RestAction<PrivateChannel> privateChannel = event.getAuthor().openPrivateChannel();
@@ -256,8 +263,13 @@ public class ProcessMessage {
 				info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
 				break;
 			case START:
-				String paramTabs[] = params.split(" ");
-				if (paramTabs.length == 3 && paramTabs[1].split(":").length == 2) {
+				if (Pattern.compile(START_REGEX).matcher(params).find()) {
+					if(params.startsWith(START_SINGLETON_MODE)) {
+						params.replaceAll(START_SINGLETON_MODE, "");
+					}else {
+						info.setTime(Integer.parseInt(params.split(" ")[2]));
+					}
+					String paramTabs[] = params.split(" ");
 					switch (paramTabs[0]) {
 					case LUNDI:
 						info.setDayOfWeek(Calendar.MONDAY);
@@ -291,7 +303,6 @@ public class ProcessMessage {
 					String time[] = paramTabs[1].split(":");
 					info.setHour(Integer.parseInt(time[0]));
 					info.setMinute(Integer.parseInt(time[1]));
-					info.setTime(Integer.parseInt(paramTabs[2]));
 					EventScheduler.update(data, event.getJDA().getGuilds());
 				} else {
 					privateChannel.complete()
