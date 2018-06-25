@@ -269,7 +269,6 @@ public class ProcessMessage {
 					}else {
 						info.setTime(Integer.parseInt(params.split(" ")[2]));
 					}
-					System.out.println("params : " + params);
 					String paramTabs[] = params.split(" ");
 					switch (paramTabs[0]) {
 					case LUNDI:

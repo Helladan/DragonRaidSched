@@ -48,7 +48,11 @@ public class AnnonceGenerator {
         Info info = data.getInfos().get(textChannel.getId());
         Guild guild = textChannel.getGuild();
         EmbedBuilder annonceBuilder = new EmbedBuilder();
-        annonceBuilder.setColor(Color.BLUE);
+        if(info.getTime() != 0) {
+        	annonceBuilder.setColor(Color.BLUE);
+        }else {
+        	annonceBuilder.setColor(Color.MAGENTA);
+        }
         String description = "";
         Cible cible = null;
         if(info.getTarget() != null && !"".equals(info.getTarget())){
