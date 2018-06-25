@@ -45,7 +45,7 @@ public class ProcessMessage {
 	
 	public final static String START_REGEX_DAYS = "(" + LUNDI + "|" + MARDI + "|" + MERCREDI + "|" + JEUDI + "|" + VENDREDI + "|" + SAMEDI + "|" + DIMANCHE + ")";
 	public final static String START_REGEX_HOURS = "[0-9]{1,2}:[0-9]{2}";
-	public final static String START_REGEX_BASE = START_REGEX_DAYS + " " + START_REGEX_HOURS;
+	public final static String START_REGEX_BASE = START_REGEX_DAYS + START_REGEX_HOURS;
 	public final static String START_REGEX = " ("+ START_SINGLETON_MODE + " " + START_REGEX_BASE + ")|(" + START_REGEX_BASE + " [1-9][0-9]*)";
 
 
