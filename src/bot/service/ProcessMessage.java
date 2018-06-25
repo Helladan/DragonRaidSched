@@ -46,7 +46,7 @@ public class ProcessMessage {
 	public final static String START_REGEX_DAYS = "(" + LUNDI + "|" + MARDI + "|" + MERCREDI + "|" + JEUDI + "|" + VENDREDI + "|" + SAMEDI + "|" + DIMANCHE + ")";
 	public final static String START_REGEX_HOURS = "[0-9]{1,2}:[0-9]{2}";
 	public final static String START_REGEX_BASE = START_REGEX_DAYS + " " + START_REGEX_HOURS;
-	public final static String START_REGEX = "(-s " + START_REGEX_BASE + ")|(" + START_REGEX_BASE + " [1-9][0-9]*)";
+	public final static String START_REGEX = " ("+ START_SINGLETON_MODE + " " + START_REGEX_BASE + ")|(" + START_REGEX_BASE + " [1-9][0-9]*)";
 
 
 	public static boolean process(MessageReceivedEvent event, Data data) {
@@ -263,8 +263,10 @@ public class ProcessMessage {
 				info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
 				break;
 			case START:
+				System.out.println("REGEX : " + START_REGEX);
+				System.out.println("params : " + params);
 				if (Pattern.compile(START_REGEX).matcher(params).find()) {
-					if(params.startsWith(START_SINGLETON_MODE)) {
+					if(params.contains(START_SINGLETON_MODE)) {
 						params.replaceAll(START_SINGLETON_MODE, "");
 					}else {
 						info.setTime(Integer.parseInt(params.split(" ")[2]));
