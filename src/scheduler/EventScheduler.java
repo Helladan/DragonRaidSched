@@ -23,7 +23,7 @@ public class EventScheduler {
 		if (executor != null) {
 			executor.shutdown();
 		}
-		Supplier<Stream<Entry<String, Info>>> infoSupplier = () -> data.getInfos().entrySet().stream().filter(entry -> entry.getValue().getTime()==0);
+		Supplier<Stream<Entry<String, Info>>> infoSupplier = () -> data.getInfos().entrySet().stream().filter(entry -> entry.getValue().getTime()>0);
 		executor = Executors.newScheduledThreadPool((int) (infoSupplier.get().count() + 1));
 		executor.scheduleAtFixedRate(new SaveRunable(data), 10, 10, TimeUnit.MINUTES);
 		infoSupplier.get().forEach(entry -> {
