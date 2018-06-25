@@ -263,7 +263,6 @@ public class ProcessMessage {
 				info.getIsPresent().sort(new RaidLeadFirst(info.getRaidLead()));
 				break;
 			case START:
-				System.out.println("REGEX : " + START_REGEX);
 				System.out.println("params : " + params);
 				if (Pattern.compile(START_REGEX).matcher(params).find()) {
 					if(params.contains(START_SINGLETON_MODE)) {
@@ -271,6 +270,7 @@ public class ProcessMessage {
 					}else {
 						info.setTime(Integer.parseInt(params.split(" ")[2]));
 					}
+					System.out.println("params : " + params);
 					String paramTabs[] = params.split(" ");
 					switch (paramTabs[0]) {
 					case LUNDI:
