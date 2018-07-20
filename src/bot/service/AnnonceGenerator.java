@@ -27,7 +27,14 @@ public class AnnonceGenerator {
     private final static String SAY_COMBATTANT= "⟾ __**Combattant**__ ⟽";
     private final static String SAY_NB_INSCRIT = "   *%s inscrit%s*\n";
     private final static String SAY_NB_RESERVE = "   *%s en reserve*";
-
+    
+    private final static String SAY_ACHIEVEMENT = "★ **État de l'escouade :**";
+    private final static String SUCCESS_OVERTEN = "Stack Overflow _(+ de 10 joueurs inscrits)_";
+    private final static String SUCCESS_ONE = "Héros _(un seul inscrit)_";
+    private final static String SUCCESS_FIVE = "Team JcJ _(5 inscrits)_";
+    private final static String SUCCESS_TEN = "Roster parfait _(10 inscrits)_";
+    private final static String SUCCESS_RESERVE = "Poules mouillées _(plus de joueurs en réserve qu'inscrits)_";
+    public String achievement = null;
 
     public static String getMessage(Info info) {
         Calendar calendar = EventScheduler.getNextSchedul(info);
@@ -103,12 +110,24 @@ public class AnnonceGenerator {
                 String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
                 annonceBuilder.addField(getName(userName), " ⇨ " + data.getPlayerMap().get(present), false);
             }
+            achievement = SUCCESS_OVERTEN;
         }
+        if (reserveSize > presentSize){achievement = SUCCESS_RESERVE;}
+        if (presentSize == 1){achievement = SUCCESS_ONE;}
+        if (presentSize == 5){achievement = SUCCESS_FIVE;}
+        if (presentSize == 10){achievement = SUCCESS_TEN;}
+        
         for(String present : info.getReserve()){
             Member member = guild.getMembersByName(present, false).get(0);
             String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
             annonceBuilder.addField(getName(userName), " ⇨ " + data.getPlayerMap().get(present), false);
         }
+        
+        if (achievement!=null){
+            annonceBuilder.addField("",SAY_ACHIEVEMENT,achievement);
+        }
+        
+        
         return annonceBuilder.build();
     }
 
