@@ -28,7 +28,7 @@ public class AnnonceGenerator {
     private final static String SAY_NB_INSCRIT = "   *%s inscrit%s*\n";
     private final static String SAY_NB_RESERVE = "   *%s en reserve*";
     
-    private final static String SAY_ACHIEVEMENT = " **État de l'escouade :**";
+    private final static String SAY_ACHIEVEMENT = "★ **État de l'escouade :**";
     private final static String SUCCESS_OVERTEN = "Stack Overflow _(+ de 10 joueurs inscrits)_";
     private final static String SUCCESS_ONE = "Héros _(un seul inscrit)_";
     private final static String SUCCESS_FIVE = "Team JcJ _(5 inscrits)_";
