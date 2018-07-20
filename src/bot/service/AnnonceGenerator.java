@@ -31,7 +31,7 @@ public class AnnonceGenerator {
     private final static String SAY_ACHIEVEMENT = "★ **État de l'escouade :**";
     private final static String SUCCESS_OVERTEN = "Stack Overflow _(+ de 10 joueurs inscrits)_";
     private final static String SUCCESS_ONE = "Héros _(un seul inscrit)_";
-    private final static String SUCCESS_FIVE = "Team JcJ _(5 inscrits)_";
+    private final static String SUCCESS_FIVE = "Foramt Donjon _(5 inscrits)_";
     private final static String SUCCESS_TEN = "Roster parfait _(10 inscrits)_";
     private final static String SUCCESS_RESERVE = "Poules mouillées _(plus de joueurs en réserve qu'inscrits)_";
 
@@ -124,7 +124,7 @@ public class AnnonceGenerator {
         }
         
         if (achievement!=null){
-            annonceBuilder.addField(SAY_ACHIEVEMENT,achievement, false);
+            annonceBuilder.addField(SAY_ACHIEVEMENT,"	" + achievement, false);
         }
         
         
