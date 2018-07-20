@@ -124,7 +124,7 @@ public class AnnonceGenerator {
         }
         
         if (achievement!=null){
-            annonceBuilder.addField("",SAY_ACHIEVEMENT,achievement);
+            annonceBuilder.addField(SAY_ACHIEVEMENT,achievement, false);
         }
         
         
