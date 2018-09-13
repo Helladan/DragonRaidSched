@@ -264,6 +264,8 @@ public class ProcessMessage {
 				break;
 			case START:
 				if (Pattern.compile(START_REGEX).matcher(params).find()) {
+					data.getInfos().remove(event.getTextChannel().getId());
+					info = new Info();
 					if(params.contains(START_SINGLETON_MODE)) {
 						params = params.replaceAll(START_SINGLETON_MODE, "");
 					}else {
@@ -303,6 +305,7 @@ public class ProcessMessage {
 					String time[] = paramTabs[1].split(":");
 					info.setHour(Integer.parseInt(time[0]));
 					info.setMinute(Integer.parseInt(time[1]));
+					data.getInfos().put(event.getTextChannel().getId(), info);
 					EventScheduler.update(data, event.getJDA().getGuilds());
 				} else {
 					privateChannel.complete()
