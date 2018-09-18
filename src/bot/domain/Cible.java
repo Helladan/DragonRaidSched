@@ -35,7 +35,9 @@ public enum Cible {
     DEIMOS("Deimos", "https://wiki.guildwars2.com/images/e/e0/Mini_Ragged_White_Mantle_Figurehead.png", null),
     HORREUR("Horreur sans âme", "https://wiki.guildwars2.com/images/d/d4/Mini_Desmina.png", null),
     GRENTH("Statues de Grenth", "https://wiki.guildwars2.com/images/3/37/Mini_Broken_King.png", null),
-    DHUUM("Dhuum", "https://wiki.guildwars2.com/images/e/e4/Mini_Dhuum.png", null);
+    DHUUM("Dhuum", "https://wiki.guildwars2.com/images/e/e4/Mini_Dhuum.png", null),
+    KENUT("Kenut", "https://render.guildwars2.com/file/453C959040B6AF7F639FDD78367AF39FD7C73246/2038614.png", null),
+    ZOMMOROS("Zommoros", "https://render.guildwars2.com/file/B316A9FAA3275D0EF6D84A9179E062BF10C4545A/2038619.png", null);
 
     private String nom;
     private String imageUrl;
