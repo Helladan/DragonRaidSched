@@ -30,7 +30,7 @@ public enum Cible {
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/cairn-l-indomptable.html"),
     MURSAAT("Surveillant mursaat", "https://wiki-fr.guildwars2.com/images/3/39/Mini-surveillant_mursaat.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/surveillant-mursaat.html"),
-    SAMAROG("Samarog", "https://wiki.guildwars2.com/images/f/f0/Mini_Samarog.png",
+    SAMAROG("Valerie Damidot", "https://wiki.guildwars2.com/images/f/f0/Mini_Samarog.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/samarog.html"),
     DEIMOS("Deimos", "https://wiki.guildwars2.com/images/e/e0/Mini_Ragged_White_Mantle_Figurehead.png", null),
     HORREUR("Horreur sans âme", "https://wiki.guildwars2.com/images/d/d4/Mini_Desmina.png", null),
