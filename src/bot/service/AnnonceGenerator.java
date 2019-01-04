@@ -112,7 +112,7 @@ public class AnnonceGenerator {
             }
             achievement = SUCCESS_OVERTEN;
         }
-        if (presentSize == reserveSize){achievement = BALANCED;}
+        if (presentSize > 1 && presentSize == reserveSize){achievement = BALANCED;}
         if (reserveSize > presentSize){achievement = SUCCESS_RESERVE;}
         if (presentSize == 1){achievement = SUCCESS_ONE;}
         if (presentSize == 5){achievement = SUCCESS_FIVE;}
