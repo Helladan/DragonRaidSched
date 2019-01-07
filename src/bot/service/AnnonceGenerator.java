@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import java.awt.Color;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -92,24 +93,31 @@ public class AnnonceGenerator {
                 annonceBuilder.setFooter(format(SAY_MODE, info.getMode()), null);
             }
         }
+        for(String user : new ArrayList<>(info.getIsPresent())) {
+        	if(guild.getMembersByName(user, false).isEmpty()) {
+            	info.getIsPresent().remove(user);
+            	return getAnnonce(data, textChannel);
+        	}
+        }
+        for(String user : new ArrayList<>(info.getReserve())) {
+        	if(guild.getMembersByName(user, false).isEmpty()) {
+            	info.getReserve().remove(user);
+            	return getAnnonce(data, textChannel);
+        	}
+        }
         List<String> presents = info.getIsPresent().subList(0, presentSize <= 10 ? presentSize : 10);
         if(presentSize>0) {
             annonceBuilder.addField("", SAY_COMBATTANT, false);
         }
         for(String present : presents){
             List<Member> members = guild.getMembersByName(present, false);
-            if(!members.isEmpty()) {
-				Member member = members.get(0);
-	            String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-	            String name = getName(userName);
-	            if(present.equals(info.getRaidLead())){
-	                name = info.getRaidEmote() + " " + name;
-	            }
-	            annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
-            } else {
-            	info.getIsPresent().remove(present);
-            	return getAnnonce(data, textChannel);
+			Member member = members.get(0);
+            String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
+            String name = getName(userName);
+            if(present.equals(info.getRaidLead())){
+                name = info.getRaidEmote() + " " + name;
             }
+            annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
         }
         if(presentSize > 10 || reserveSize >0){
             annonceBuilder.addField("", SAY_RESERVE, false);
