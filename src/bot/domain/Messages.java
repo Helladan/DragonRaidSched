@@ -18,7 +18,6 @@ public enum Messages {
 	TAPE_HELP("tape " + ProcessMessage.HELP + " pour de l'aide"),
 	INSCRITPION("merci de t'inscrire (entre les emotes des divers classes que tu peux jouer en Raid)"),
 	OVERFLOW("10 personnes sont dÃ©jÃ  inscrites, tu seras en reserve"),
-	BALANCED("\"Perfectly balanced, as all things should be.\" - Thanos"),
 	NO_INSCRIPTION("Aucune inscription n'avait Ã©tÃ© faite");
 	private String message; 
 }

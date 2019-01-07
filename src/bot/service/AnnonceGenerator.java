@@ -1,21 +1,24 @@
 package bot.service;
 
-import bot.domain.Cible;
-import bot.domain.Data;
-import bot.domain.Info;
-import bot.domain.Mode;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
-import scheduler.EventRunable;
-import scheduler.EventScheduler;
+import static java.lang.String.format;
 
-import java.awt.*;
+import java.awt.Color;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import static java.lang.String.format;
+import bot.domain.Cible;
+import bot.domain.Data;
+import bot.domain.Info;
+import bot.domain.Mode;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.TextChannel;
+import scheduler.EventScheduler;
 
 public class AnnonceGenerator {
     private final static DateFormat DATE_FORMAT = DateFormat.getDateInstance(DateFormat.FULL, Locale.FRANCE);
@@ -34,6 +37,7 @@ public class AnnonceGenerator {
     private final static String SUCCESS_FIVE = "Format Donjon _(5 inscrits)_";
     private final static String SUCCESS_TEN = "Roster parfait _(10 inscrits)_";
     private final static String SUCCESS_RESERVE = "Poules mouillées _(plus de joueurs en réserve qu'inscrits)_";
+    private final static String SUCCESS_BALANCED = "\"Perfectly balanced, as all things should be.\" - Thanos";
 
     public static String getMessage(Info info) {
         Calendar calendar = EventScheduler.getNextSchedul(info);
@@ -93,13 +97,19 @@ public class AnnonceGenerator {
             annonceBuilder.addField("", SAY_COMBATTANT, false);
         }
         for(String present : presents){
-            Member member = guild.getMembersByName(present, false).get(0);
-            String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
-            String name = getName(userName);
-            if(present.equals(info.getRaidLead())){
-                name = info.getRaidEmote() + " " + name;
+            List<Member> members = guild.getMembersByName(present, false);
+            if(!members.isEmpty()) {
+				Member member = members.get(0);
+	            String userName = (member.getNickname() != null) ? member.getNickname() : member.getUser().getName();
+	            String name = getName(userName);
+	            if(present.equals(info.getRaidLead())){
+	                name = info.getRaidEmote() + " " + name;
+	            }
+	            annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
+            } else {
+            	info.getIsPresent().remove(present);
+            	return getAnnonce(data, textChannel);
             }
-            annonceBuilder.addField(name, " ⇨ " + data.getPlayerMap().get(present), false);
         }
         if(presentSize > 10 || reserveSize >0){
             annonceBuilder.addField("", SAY_RESERVE, false);
@@ -112,7 +122,7 @@ public class AnnonceGenerator {
             }
             achievement = SUCCESS_OVERTEN;
         }
-        if (presentSize > 1 && presentSize == reserveSize){achievement = BALANCED;}
+        if (presentSize > 1 && presentSize == reserveSize){achievement = SUCCESS_BALANCED;}
         if (reserveSize > presentSize){achievement = SUCCESS_RESERVE;}
         if (presentSize == 1){achievement = SUCCESS_ONE;}
         if (presentSize == 5){achievement = SUCCESS_FIVE;}
