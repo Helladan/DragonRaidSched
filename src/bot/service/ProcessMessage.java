@@ -126,7 +126,7 @@ public class ProcessMessage {
 						}
 					} else {
 						msg += String.join(" ou ", PRESENT) + " : s'inscrire pour le Raid\n"
-								+ String.join(" ou ", RESERVE) + " : s'inscrire en reserve\n"
+								// + String.join(" ou ", RESERVE) + " : s'inscrire en reserve\n"
 								+ String.join(" ou ", NON_PRESENT) + " : se désinscrire\n" 
 								+ HELP + " : afficher l'aide\n";
 						if (hasPermition(event)) {
@@ -180,10 +180,10 @@ public class ProcessMessage {
 		}
 		if (NON_PRESENT.contains(message)) {
 			return Commande.NON_PRESENT;
-		}
+		}/*
 		if (RESERVE.contains(message)) {
 			return Commande.RESERVE;
-		}
+		}*/
 		if (message.equals(START)) {
 			return Commande.START;
 		}
