@@ -38,7 +38,7 @@ public enum Cible {
     DHUUM("Dhuum", "https://wiki.guildwars2.com/images/e/e4/Mini_Dhuum.png", "https://www.lebusmagique.fr/pages/expeditions/raids/salle-des-chaines/dhuum.html"),
     AMALGAME("Amalgame Conjuré", "https://render.guildwars2.com/file/B316A9FAA3275D0EF6D84A9179E062BF10C4545A/2038619.png", "https://www.lebusmagique.fr/pages/expeditions/raids/gambit-de-forgeconte/amalgame-conjure.html"),
     LARGOS("Jumeaux Largos", "https://render.guildwars2.com/file/453C959040B6AF7F639FDD78367AF39FD7C73246/2038614.png", "https://www.lebusmagique.fr/pages/expeditions/raids/gambit-de-forgeconte/jumeaux-largos.html"),
-    Qadim("Qadim","https://render.guildwars2.com/file/640241E807BF6D14447406C934F5D6FE144A0A4E/2155914.png",null);
+    QADIM("Qadim","https://render.guildwars2.com/file/640241E807BF6D14447406C934F5D6FE144A0A4E/2155914.png",null);
 
     private String nom;
     private String imageUrl;
