@@ -30,7 +30,7 @@ public enum Cible {
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/cairn-l-indomptable.html"),
     MURSAAT("Surveillant mursaat", "https://wiki-fr.guildwars2.com/images/3/39/Mini-surveillant_mursaat.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/surveillant-mursaat.html"),
-    SAMAROG("Valerie Damidot", "https://wiki.guildwars2.com/images/f/f0/Mini_Samarog.png",
+    SAMAROG("Samarog", "https://wiki.guildwars2.com/images/f/f0/Mini_Samarog.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/samarog.html"),
     DEIMOS("Deimos", "https://wiki.guildwars2.com/images/e/e0/Mini_Ragged_White_Mantle_Figurehead.png", "https://www.lebusmagique.fr/pages/expeditions/raids/bastion-du-penitent/deimos-redux.html"),
     HORREUR("Horreur sans âme", "https://wiki.guildwars2.com/images/d/d4/Mini_Desmina.png", "https://www.lebusmagique.fr/pages/expeditions/raids/salle-des-chaines/l-horreur-sans-ame.html"),
@@ -38,7 +38,10 @@ public enum Cible {
     DHUUM("Dhuum", "https://wiki.guildwars2.com/images/e/e4/Mini_Dhuum.png", "https://www.lebusmagique.fr/pages/expeditions/raids/salle-des-chaines/dhuum.html"),
     AMALGAME("Amalgame Conjuré", "https://render.guildwars2.com/file/B316A9FAA3275D0EF6D84A9179E062BF10C4545A/2038619.png", "https://www.lebusmagique.fr/pages/expeditions/raids/gambit-de-forgeconte/amalgame-conjure.html"),
     LARGOS("Jumeaux Largos", "https://render.guildwars2.com/file/453C959040B6AF7F639FDD78367AF39FD7C73246/2038614.png", "https://www.lebusmagique.fr/pages/expeditions/raids/gambit-de-forgeconte/jumeaux-largos.html"),
-    QADIM("Qadim","https://render.guildwars2.com/file/640241E807BF6D14447406C934F5D6FE144A0A4E/2155914.png",null);
+    QADIM("Qadim","https://render.guildwars2.com/file/640241E807BF6D14447406C934F5D6FE144A0A4E/2155914.png","https://www.lebusmagique.fr/pages/expeditions/raids/gambit-de-forgeconte/qadim.html"),
+    ADINA("Cardinale Adina","https://wiki.guildwars2.com/images/0/03/Mini_Djinn_Lamp.png",null),
+    SABIR("Cardinal Sabir","https://wiki.guildwars2.com/images/9/9a/Mini_Key_of_Ahdashim.png",null),
+    QI("Qadim l'Inégalé","https://wiki.guildwars2.com/images/8/8b/Mini_Qadim_the_Peerless.png",null);
 
     private String nom;
     private String imageUrl;
