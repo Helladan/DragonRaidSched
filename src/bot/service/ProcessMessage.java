@@ -104,13 +104,13 @@ public class ProcessMessage {
 						if(helpCommande != null) {
 							switch (helpCommande) {
 							case MODE:
-								msg += "mode de jeu.\nPeux prendre n'importe quel texte, mais ceux-ci sont reconu :\n";
+								msg += "mode de jeu.\nPeut prendre n'importe quel texte, mais ceux-ci sont reconus :\n";
 								for(Mode mode : Mode.values()) {
 									msg += " - " + mode.name() + " (" + mode.getNom() + ")\n";
 								}
 								break;
 							case TARGET:
-								msg += "cible du Raid.\nPeux prendre n'importe quel texte, mais ceux-ci sont reconu :\n";
+								msg += "cible du Raid.\nPeut prendre n'importe quel texte, mais ceux-ci sont reconus :\n";
 								for(Cible cible : Cible.values()) {
 									msg += " - " + cible.name() + " (" + cible.getNom() + ")\n";
 								}
@@ -119,7 +119,7 @@ public class ProcessMessage {
 								msg += "set le jour des raid.\nFormat : \n" + Messages.START.getMessage();
 								break;
 							default:
-								msg += "pas d'explication particuliére sur cette commande.";
+								msg += "pas d'explication particulière sur cette commande.";
 							}
 						} else {
 							privateChannel.complete().sendMessage(Messages.MAUVAISE_COMMANDE.getMessage()).submit();
@@ -130,10 +130,10 @@ public class ProcessMessage {
 								+ String.join(" ou ", NON_PRESENT) + " : se désinscrire\n" 
 								+ HELP + " : afficher l'aide\n";
 						if (hasPermition(event)) {
-							msg += START + " : regler le moment de l'evenement sur le canal\n"
+							msg += START + " : régler le moment de l'evenement sur le canal\n"
 								+ MODE + " : mode de jeu\n"
 								+ TARGET + " : cible du raid\n" 
-								+ RAID_LEAD + " : ce marquer comme raid lead";
+								+ RAID_LEAD + " : se marquer comme raid lead";
 						}
 					}
 					privateChannel.complete().sendMessage(msg).submit();

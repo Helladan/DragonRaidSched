@@ -13,7 +13,7 @@ public class DragonRaidSched {
         	new DataPersist();
             new Bot(args[0]);
         } else {
-            System.out.println("Vieulliez indiquer le token du bot");
+            System.out.println("Veuillez indiquer le token du bot");
         }
     }
 }
