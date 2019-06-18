@@ -3,12 +3,8 @@ package scheduler;
 import bot.service.AnnonceGenerator;
 import bot.domain.Data;
 import bot.domain.Info;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class EventRunable implements Runnable{

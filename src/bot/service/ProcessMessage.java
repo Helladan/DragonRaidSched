@@ -18,10 +18,6 @@ import scheduler.EventScheduler;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import javax.print.attribute.standard.RequestingUserName;
-
-import org.omg.CORBA.CODESET_INCOMPATIBLE;
-
 public class ProcessMessage {
 	private static final String START_SINGLETON_MODE = "-s ";
 	private final static String START_CMD = "$";
