@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Cible {
-    VG("Vale Guardian", "https://wiki-fr.guildwars2.com/images/0/0f/Mini-Gardien_de_la_Vall%C3%A9e.png",
+    VG("Gardien de la vallée", "https://wiki-fr.guildwars2.com/images/0/0f/Mini-Gardien_de_la_Vall%C3%A9e.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/vallee-des-esprits/le-gardien-de-la-vallee.html"),
     GORSEVAL("Gorseval le Disparate", "https://wiki.guildwars2.com/images/d/d1/Mini_Gorseval_the_Multifarious.png",
             "http://www.lebusmagique.fr/pages/expeditions/raids/vallee-des-esprits/gorseval.html"),
