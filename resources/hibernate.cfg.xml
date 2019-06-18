@@ -5,13 +5,13 @@
 <hibernate-configuration>
 	<session-factory>
 		<property name="hibernate.connection.url">
-			jdbc:postgresql://ec2-79-125-6-160.eu-west-1.compute.amazonaws.com:5432/d98fr0eqrupgop?ssl=require&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory
+			jdbc:postgresql://postgres:5432/dragonRaidSched
 		</property>
 		<property name="hibernate.connection.username">
-			tsaonhtxnlciqg
+			dragonRaidSched
 		</property>
 		<property name="hibernate.connection.password">
-			bc2c29fbf374dfce1922b4f11de07cd5d83113173ee92572e48251ab5f7ac3f7
+			dragonRaidSched
 		</property>
 		<property name="hibernate.connection.driver_class">
 			org.postgresql.Driver
@@ -23,7 +23,7 @@
         <property name="hibernate.show_sql">true</property>
  
         <!-- Drop and re-create all database on startup -->
-        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
  
         <!-- Annotated entity classes -->
         <mapping class="bot.domain.Data"/>
