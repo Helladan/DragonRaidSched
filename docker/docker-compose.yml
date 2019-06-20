@@ -1,0 +1,30 @@
+version: '3.1'
+services:
+
+  DragonRaidSched:
+    image: java:8
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    volumes:
+      - /home/anthony/Projects/Java/DragonRaidSched:/DragonRaidSched
+    container_name: DragonRaidSched 
+    depends_on:
+      - postgres
+#    command: java -jar DragonRaidSched/target/DragonRaidSched-1.0-SNAPSHOT.jar NTcxMzA3MTUxNDQ4ODY2ODQw.XQf1ZA.rI37Wjm-9LWVUdr8i_BWlJCQkfY
+    command: java -jar DragonRaidSched/target/DragonRaidSched-1.0-SNAPSHOT.jar NDI2Njc1NzIxMzc3ODA4Mzk0.DdnYUQ.19VGi0RkoNOi5fMY8p6rGWkZJ78
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: dragonRaidSched
+      POSTGRES_USER: dragonRaidSched
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8088:8080
+
