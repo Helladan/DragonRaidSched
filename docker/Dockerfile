@@ -6,7 +6,8 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.s
 RUN chmod a+x /start.sh && \
     chmod a+x /wait-for-it.sh
 
-COPY /* /DragonRaidSched/
-RUN cd DragonRaidSched && \
+
+RUN git clone https://github.com/Helladan/DragonRaidSched.git -b feat/add-docker && \
+    cd DragonRaidSched && \
     mvn install
 
